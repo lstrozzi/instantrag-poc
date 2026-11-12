@@ -37,22 +37,25 @@ Phases
     -3   additionally request the final answer: it must be derived from the
          id-referenced RESULTS values (Example C)
 
-Usage (from PythonServer root, venv active)
--------------------------------------------
-    python scripts/instantrag_qwen_demo.py -1
-    python scripts/instantrag_qwen_demo.py -2
-    python scripts/instantrag_qwen_demo.py -3
+Usage (from the repository root, .venv active)
+----------------------------------------------
+    python src/instantrag_qwen_demo.py -1
+    python src/instantrag_qwen_demo.py -2
+    python src/instantrag_qwen_demo.py -3
 """
 
 import argparse
 import json
-import os
 import re
 import sys
 import urllib.request
 from pathlib import Path
 
 import requests
+
+# running as a plain script leaves no package context, so add src/ explicitly
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from llm_request import resolve_api_key
 
 USER_QUESTION_DEFAULT = "Please calculate 10+(2*4)"
 NO_RESULT = object()
@@ -69,36 +72,28 @@ ATTR_RE = re.compile(r'(\w+)="([^"]*)"')
 # Config helpers
 # ---------------------------------------------------------------------------
 
+ROOT = Path(__file__).resolve().parent.parent
+
+
 def _settings_path_default() -> Path:
-    here = Path(__file__).parent.parent
-    result = here.parent / "ThalabusWeb" / "Configuration" / "LlmSettings.json"
-    return result
+    return ROOT / "config" / "llm_config.json"
 
 
 def _system_prompt_path_default() -> Path:
-    here = Path(__file__).parent.parent
-    result = here / "config" / "instantrag.txt"
-    return result
+    return ROOT / "config" / "instantrag.txt"
 
 
-def _resolve_token(token_str):
-    resolved = token_str if token_str is not None else ""
-    resolved = re.sub(r"\{\{([^}]+)\}\}", lambda m: os.environ.get(m.group(1), ""), resolved)
-    resolved = re.sub(r"\{([^}]+)\}", lambda m: os.environ.get(m.group(1), ""), resolved)
-    return resolved
-
-
-def load_model(settings_path, model_id):
+def load_model(settings_path):
+    """Load the single-model llm_config.json into the shape run_turn expects."""
     with open(settings_path, encoding="utf-8-sig") as f:
-        data = json.load(f)
-    model_entry = {}
-    for m in data.get("models", []):
-        if m.get("id") == model_id:
-            model_entry = m
-            break
-    if not model_entry:
-        raise ValueError(f"No model with id '{model_id}' found in {settings_path}")
-    return model_entry
+        config = json.load(f)
+    base_url = config.get("base_url", "").rstrip("/")
+    if not base_url:
+        raise ValueError(f"'base_url' is missing or empty in {settings_path}")
+    config["endpoint"] = base_url + config.get("endpoint", "/chat/completions")
+    # token is resolved from the environment, falling back to the .env file
+    config["token"] = resolve_api_key(config)
+    return config
 
 
 def load_system_prompt(prompt_path):
@@ -229,7 +224,7 @@ def run_turn(model_cfg, messages, max_tokens, temperature, stop_at_tool, dep_val
     }
     payload.update(PAYLOAD_EXTRAS)
     headers = {"Content-Type": "application/json", "Accept": "text/event-stream"}
-    token = _resolve_token(model_cfg.get("token"))
+    token = model_cfg.get("token")
     if token:
         headers["Authorization"] = "Bearer " + token
 
@@ -464,8 +459,8 @@ def run_phase(model_cfg, system_prompt, question, phase, max_tokens, temperature
 def parse_arguments():
     parser = argparse.ArgumentParser(description="InstantRAG interrupt/resume demo against qwen-3.5-35b")
     parser.add_argument("phase", metavar="[-1|-2|-3]", choices=["-1", "-2", "-3"], help="phase to run (see module docstring)")
-    parser.add_argument("--model-id", default="DEFAULT", help="model entry id in LlmSettings.json (default: DEFAULT)")
-    parser.add_argument("--settings", type=Path, default=_settings_path_default(), help="path to LlmSettings.json")
+    parser.add_argument("--model", default=None, help="model to use (default: the model in llm_config.json)")
+    parser.add_argument("--settings", type=Path, default=_settings_path_default(), help="path to llm_config.json")
     parser.add_argument("--system-prompt", type=Path, default=_system_prompt_path_default(), help="path to the system prompt file")
     parser.add_argument("--question", default=USER_QUESTION_DEFAULT, help="the user question to ask")
     parser.add_argument("--max-tokens", type=int, default=2048, help="max tokens for the completion")
@@ -477,7 +472,9 @@ def main():
     exit_code = 0
     try:
         arguments = parse_arguments()
-        model_cfg = load_model(arguments.settings, arguments.model_id)
+        model_cfg = load_model(arguments.settings)
+        if arguments.model:
+            model_cfg["model"] = arguments.model
         system_prompt = load_system_prompt(arguments.system_prompt)
         print(f"model    : {model_cfg['model']}")
         print(f"endpoint : {model_cfg['endpoint']}")
