@@ -230,6 +230,11 @@ def run_turn(model_cfg, messages, max_tokens, temperature, stop_at_tool, dep_val
 
     reasoning = ""
     content = ""
+    # untouched copies of each channel as received: the interrupt path trims
+    # `reasoning`/`content` at the intercepted tag, so the full output the model
+    # actually produced is kept here for the report
+    reasoning_all = ""
+    content_all = ""
     finish_reason = None
     usage = {}
     interrupt = None
@@ -252,11 +257,14 @@ def run_turn(model_cfg, messages, max_tokens, temperature, stop_at_tool, dep_val
             delta = choices[0].get("delta") or {}
             finish_reason = choices[0].get("finish_reason") or finish_reason
             delta_reasoning = delta.get("reasoning") or delta.get("reasoning_content") or ""
-            content += delta.get("content") or ""
+            delta_content = delta.get("content") or ""
+            content += delta_content
             if interrupt is not None:
-                discarded += delta_reasoning + (delta.get("content") or "")
+                discarded += delta_reasoning + delta_content
                 continue
             reasoning += delta_reasoning
+            reasoning_all += delta_reasoning
+            content_all += delta_content
             if stop_at_tool:
                 tool = first_empty_tag(reasoning)
                 leak = False
@@ -279,6 +287,8 @@ def run_turn(model_cfg, messages, max_tokens, temperature, stop_at_tool, dep_val
     result = {
         "reasoning": reasoning,
         "content": content,
+        "reasoning_all": reasoning_all,
+        "content_all": content_all,
         "finish_reason": finish_reason,
         "usage": usage,
         "interrupt": interrupt,
@@ -300,7 +310,11 @@ def print_streamed_turn(label, turn):
     print(turn["reasoning"] if turn["reasoning"] else "(none)")
     print()
     print("[ANSWER / OUTPUT COLLECTED]")
-    print(turn["content"].strip() if turn["content"] else "(none yet)")
+    # show the whole answer channel as received (up to the stop), including the
+    # intercepted tag: on a leak turn["content"] is trimmed at the tag and would
+    # otherwise hide the very evidence the channel note refers to
+    answer_shown = turn.get("content_all") or turn["content"]
+    print(answer_shown.strip() if answer_shown.strip() else "(none yet)")
     print()
     if turn["interrupt"] is not None:
         tool = turn["interrupt"]["tool"]
