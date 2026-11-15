@@ -1,0 +1,507 @@
+{
+  "schema_version": 1,
+  "frozen_at": "2026-11-15T20:45+01:00",
+  "approved_by": "Roland (plan O7)",
+  "rules": [
+    "integers only; no operand 0 or 1",
+    "intermediate and final result multi-digit and distinct within a set (exception: reference T1-01)",
+    "no numbers from the prompt examples (2, 3, 5, 15) except in the reference item",
+    "argument order within a call does not matter (ADD/MUL commutative); operation order is fixed (innermost first)",
+    "question format identical to the reference: 'Please calculate a+(b*c)' / 'Please calculate a*(b+c)'"
+  ],
+  "sets": {
+    "T1": {
+      "form": "a+(b*c)",
+      "first_op": "MUL",
+      "items": [
+        {
+          "id": "T1-01",
+          "question": "Please calculate 10+(2*4)",
+          "reference": true,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                2,
+                4
+              ],
+              "result": 8
+            },
+            {
+              "op": "ADD",
+              "args": [
+                10,
+                8
+              ],
+              "result": 18
+            }
+          ],
+          "ground_truth": 18
+        },
+        {
+          "id": "T1-02",
+          "question": "Please calculate 13+(6*7)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                6,
+                7
+              ],
+              "result": 42
+            },
+            {
+              "op": "ADD",
+              "args": [
+                13,
+                42
+              ],
+              "result": 55
+            }
+          ],
+          "ground_truth": 55
+        },
+        {
+          "id": "T1-03",
+          "question": "Please calculate 21+(4*9)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                4,
+                9
+              ],
+              "result": 36
+            },
+            {
+              "op": "ADD",
+              "args": [
+                21,
+                36
+              ],
+              "result": 57
+            }
+          ],
+          "ground_truth": 57
+        },
+        {
+          "id": "T1-04",
+          "question": "Please calculate 17+(6*8)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                6,
+                8
+              ],
+              "result": 48
+            },
+            {
+              "op": "ADD",
+              "args": [
+                17,
+                48
+              ],
+              "result": 65
+            }
+          ],
+          "ground_truth": 65
+        },
+        {
+          "id": "T1-05",
+          "question": "Please calculate 14+(7*9)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                7,
+                9
+              ],
+              "result": 63
+            },
+            {
+              "op": "ADD",
+              "args": [
+                14,
+                63
+              ],
+              "result": 77
+            }
+          ],
+          "ground_truth": 77
+        },
+        {
+          "id": "T1-06",
+          "question": "Please calculate 26+(4*8)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                4,
+                8
+              ],
+              "result": 32
+            },
+            {
+              "op": "ADD",
+              "args": [
+                26,
+                32
+              ],
+              "result": 58
+            }
+          ],
+          "ground_truth": 58
+        },
+        {
+          "id": "T1-07",
+          "question": "Please calculate 19+(6*9)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                6,
+                9
+              ],
+              "result": 54
+            },
+            {
+              "op": "ADD",
+              "args": [
+                19,
+                54
+              ],
+              "result": 73
+            }
+          ],
+          "ground_truth": 73
+        },
+        {
+          "id": "T1-08",
+          "question": "Please calculate 32+(7*8)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                7,
+                8
+              ],
+              "result": 56
+            },
+            {
+              "op": "ADD",
+              "args": [
+                32,
+                56
+              ],
+              "result": 88
+            }
+          ],
+          "ground_truth": 88
+        },
+        {
+          "id": "T1-09",
+          "question": "Please calculate 11+(8*9)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                8,
+                9
+              ],
+              "result": 72
+            },
+            {
+              "op": "ADD",
+              "args": [
+                11,
+                72
+              ],
+              "result": 83
+            }
+          ],
+          "ground_truth": 83
+        },
+        {
+          "id": "T1-10",
+          "question": "Please calculate 31+(4*7)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "MUL",
+              "args": [
+                4,
+                7
+              ],
+              "result": 28
+            },
+            {
+              "op": "ADD",
+              "args": [
+                31,
+                28
+              ],
+              "result": 59
+            }
+          ],
+          "ground_truth": 59
+        }
+      ]
+    },
+    "T2": {
+      "form": "a*(b+c)",
+      "first_op": "ADD",
+      "note": "same structure as the prompt examples (H8)",
+      "items": [
+        {
+          "id": "T2-01",
+          "question": "Please calculate 7*(4+9)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                4,
+                9
+              ],
+              "result": 13
+            },
+            {
+              "op": "MUL",
+              "args": [
+                7,
+                13
+              ],
+              "result": 91
+            }
+          ],
+          "ground_truth": 91
+        },
+        {
+          "id": "T2-02",
+          "question": "Please calculate 4*(9+8)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                9,
+                8
+              ],
+              "result": 17
+            },
+            {
+              "op": "MUL",
+              "args": [
+                4,
+                17
+              ],
+              "result": 68
+            }
+          ],
+          "ground_truth": 68
+        },
+        {
+          "id": "T2-03",
+          "question": "Please calculate 6*(4+8)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                4,
+                8
+              ],
+              "result": 12
+            },
+            {
+              "op": "MUL",
+              "args": [
+                6,
+                12
+              ],
+              "result": 72
+            }
+          ],
+          "ground_truth": 72
+        },
+        {
+          "id": "T2-04",
+          "question": "Please calculate 8*(4+7)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                4,
+                7
+              ],
+              "result": 11
+            },
+            {
+              "op": "MUL",
+              "args": [
+                8,
+                11
+              ],
+              "result": 88
+            }
+          ],
+          "ground_truth": 88
+        },
+        {
+          "id": "T2-05",
+          "question": "Please calculate 9*(4+6)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                4,
+                6
+              ],
+              "result": 10
+            },
+            {
+              "op": "MUL",
+              "args": [
+                9,
+                10
+              ],
+              "result": 90
+            }
+          ],
+          "ground_truth": 90
+        },
+        {
+          "id": "T2-06",
+          "question": "Please calculate 6*(7+9)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                7,
+                9
+              ],
+              "result": 16
+            },
+            {
+              "op": "MUL",
+              "args": [
+                6,
+                16
+              ],
+              "result": 96
+            }
+          ],
+          "ground_truth": 96
+        },
+        {
+          "id": "T2-07",
+          "question": "Please calculate 4*(6+8)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                6,
+                8
+              ],
+              "result": 14
+            },
+            {
+              "op": "MUL",
+              "args": [
+                4,
+                14
+              ],
+              "result": 56
+            }
+          ],
+          "ground_truth": 56
+        },
+        {
+          "id": "T2-08",
+          "question": "Please calculate 7*(8+11)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                8,
+                11
+              ],
+              "result": 19
+            },
+            {
+              "op": "MUL",
+              "args": [
+                7,
+                19
+              ],
+              "result": 133
+            }
+          ],
+          "ground_truth": 133
+        },
+        {
+          "id": "T2-09",
+          "question": "Please calculate 9*(6+12)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                6,
+                12
+              ],
+              "result": 18
+            },
+            {
+              "op": "MUL",
+              "args": [
+                9,
+                18
+              ],
+              "result": 162
+            }
+          ],
+          "ground_truth": 162
+        },
+        {
+          "id": "T2-10",
+          "question": "Please calculate 8*(9+13)",
+          "reference": false,
+          "expected_calls": [
+            {
+              "op": "ADD",
+              "args": [
+                9,
+                13
+              ],
+              "result": 22
+            },
+            {
+              "op": "MUL",
+              "args": [
+                8,
+                22
+              ],
+              "result": 176
+            }
+          ],
+          "ground_truth": 176
+        }
+      ]
+    }
+  }
+}

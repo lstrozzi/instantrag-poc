@@ -9,6 +9,8 @@ Luca Strozzi): streamed tool-call interception ("Instant RAG") using arithmetic 
   decisions, notebook spec, implementation steps, status log. Read it at the start of every
   session before proposing any work.
 - `doc/instantrag.md` — Luca's documentation of the harness and the recorded reference runs.
+- `doc/prompt-versions.md` — all system prompt versions (S0, S1, S2, …) and what differs. Register new
+  versions there before using them in experiments.
 
 ## Layout
 - `src/instantrag_qwen_demo.py` — reference harness (phases -1/-2/-3), Luca's instrument
@@ -37,7 +39,7 @@ Luca Strozzi): streamed tool-call interception ("Instant RAG") using arithmetic 
 9. No git commit or push without approval; pushes go to Luca's repository.
 
 ## End of every step
-- Append a dated entry to `doc/poc-sprint-plan.md` §13 (status log): what changed, how it was
+- Append an entry with date and time (Europe/Berlin) to `doc/poc-sprint-plan.md` §13 (status log): what changed, how it was
   tested and with what result, open issues, proposed next step.
 - Propose a commit message; commit only after approval.
 - Commit message format (Roland's standard): compact and structured. One imperative subject line

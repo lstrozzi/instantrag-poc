@@ -49,6 +49,8 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | 2026-11-15 | `ipykernel` und `pandas` kommen in `requirements.txt` (O5). | Kernel für VS Code; Tabellen in der Auswertung. |
 | 2026-11-15 | Erfolgsschwellen H1: gestützt ab 8/10, geschwächt bei ≤ 5/10 (O6). | Im Notebook §0 mit Datum festhalten, bevor E1 läuft. |
 | 2026-11-15 | Python-Umgebung: Conda-Env `instantrag` mit Python 3.11 statt `.venv` (Lösungsweg Schritt 1). | `python` ist außerhalb der Anaconda Prompt nicht im PATH; ein venv aus Anacondas Python hat unter Windows bekannte SSL-/DLL-Ladeprobleme, der Harness braucht aber HTTPS. 3.11 wie in Lucas Umgebung (`cpython-311` im Git-Verlauf). Claude Code aus der aktivierten Anaconda Prompt starten. |
+| 2026-11-15 | Bewertungsregeln für Schritt 3 freigegeben (12 Regeln, im Notebook Abschnitt 6.1). | Grundlage aller Codes und Erfolgsstufen; Präzisierungen aus der Umsetzung offen als O11. |
+| 2026-11-15 | `matplotlib` als neue Abhängigkeit (Balkendiagramm der Erfolgsraten mit Wilson-KI). | Per pip im Env `instantrag` installiert und in `requirements.txt` eingetragen. |
 
 ## 3. Offene Entscheidungen (vor der Umsetzung klären)
 
@@ -60,10 +62,11 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | O4 | Rohdaten `results/` ins Repo committen? | ja (Reproduzierbarkeitspaket laut Exposé); vorher mit Luca klären, ob das Repo privat ist | offen |
 | O5 | `ipykernel` und `pandas` in `requirements.txt` aufnehmen? | ja | entschieden 15.11. (§2) |
 | O6 | Erfolgsschwellen H1 (Vorschlag: ≥ 8/10 gestützt, ≤ 5/10 geschwächt) | vor E1 mit Datum im Notebook §0 fixieren | entschieden 15.11. (§2) |
-| O7 | Wortlaut der Prompt-Varianten S1/S2 | Entwurf in Schritt 5, Freigabe durch Roland | Entwurf im Projekt-Chat 15.11. vorgelegt; Freigabe ausstehend |
+| O7 | Wortlaut der Prompt-Varianten S1/S2 | Entwurf in Schritt 5, Freigabe durch Roland | entschieden 15.11. 20:41 – Dateien angelegt, siehe `doc/prompt-versions.md` |
 | O8 | `CLAUDE.md` committen? Gilt dann für alle Claude-Code-Nutzer des Repos, auch Luca. | ja, Luca kurz informieren | entschieden 15.11. (§2): Commit erst nach der Worksession |
 | O9 | RESULTS-Platzierung: Roland erinnert eine Absprache mit Luca „als System-Nachricht“. Laut `instantrag.md` §2/§7 lehnt das Gateway System-Nachrichten außerhalb von Position 0 ab (HTTP 400). | Montag in Rolle `user` wie in Lucas Harness (Replikation); S1/S2 beschreiben RESULTS rollenneutral als Server-Nachricht; Variante „RESULTS im System-Inhalt an Position 0“ als E7 nach Klärung mit Luca (§11) | offen |
 | O10 | Resume-Präfix: Roland schlägt `<thinking>…</thinking>` statt `<\|im_start\|>` vor. | Protokoll nicht umschreiben: `<\|im_start\|>` ist der ChatML-Nachrichtenstart, Qwens Thinking-Block ist `<think>…</think>`, ein schließendes Tag würde das Thinking beenden. V0 (c) testet `<\|im_start\|>` / `<think>` / ohne Präfix; im Notebook wird der Reasoning-Kanal als „Thinking“ beschriftet | offen |
+| O11 | Präzisierungen der Bewertungsregeln aus Schritt 3 (Notebook 6.1): (a) Id-Verweis auf eine nicht veröffentlichte Id = A-WRONG (Vorschlag war A-MALF; A-MALF bleibt „vom Parser nicht erkannt“); (b) `18.5` und `0.18` zählen nicht als 18; (c) Soll-Argumente von Call 2 mit dem tatsächlich veröffentlichten Wert (relevant für E6); (d) C-FINAL auch für eine vorzeitige Antwort mit Zahl in Phase −3; (e) jeder Call nach beiden Ergebnissen = A-WRONG; (f) „korrekt“ in Phase −1/−2 = ausgeführte Calls wie erwartet | bestätigen | entschieden 15.11.: (a) als A-WRONG, (b)–(f) wie vorgeschlagen |
 
 ## 4. Befundlage (Analyse 2026-11-14)
 
@@ -266,7 +269,7 @@ Der Selbsttest schreibt in eine eigene Datei (z. B. `results/selftest.jsonl`), n
 - [ ] 2. **Claude Code:** Notebook-Gerüst (Einrichtung, Rekorder, JSONL, Darstellung) + Offline-Selbsttest → Review durch Roland
 - [ ] 3. **Claude Code:** Bewertungszellen (§8) + Tests → Review
 - [ ] 4. **Roland:** V0 ausführen (~8 Requests) → Entscheidung zu Cache-Umgehung und Fortsetzung im Projekt-Chat
-- [ ] 5. **Claude Code/Desktop:** Entwurf S1/S2 + `config/poc_items.json` → Freigabe des Wortlauts durch Roland
+- [x] 5. **Claude Code/Desktop:** Entwurf S1/S2 + `config/poc_items.json` → Freigabe des Wortlauts durch Roland
 - [ ] 6. **Roland:** E1, E2, E4 (Mo) → Auswertung im Projekt-Chat
 - [ ] 7. E3, E5 (bis Mi, nach Review mit Luca); E6 optional (bis Fr)
 - [ ] **Ende der Worksession 15.11.:** Commit + Push nach Freigabe → Sanity-Check auf dem Laptop
@@ -297,6 +300,8 @@ Der Selbsttest schreibt in eine eigene Datei (z. B. `results/selftest.jsonl`), n
    nächste Schritte (`<RAG>`-Tags, parallele Aufrufe, B2 vs. P); Fragen an Frau Oelke
 
 ## 13. Statuslog (append-only, neueste Einträge unten)
+
+Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Versionen und ihre Unterschiede: `doc/prompt-versions.md`.
 
 - **2026-11-14 · Claude Desktop:** Analyse von Doku, Code und Prompt; Befunde (§4), Hypothesen (§6),
   Experimentmatrix (§7) und Notebook-Design (§9) erarbeitet. Von Roland geklärt: de²generator nicht im Pfad,
@@ -371,6 +376,57 @@ Der Selbsttest schreibt in eine eigene Datei (z. B. `results/selftest.jsonl`), n
   - **Offen:** `results/selftest.jsonl` hat inzwischen 6 Zeilen aus Tests (O4). Playground-Läufe mit fester
     Frage bleiben trotz zufälligem Seed abhängig davon, ob der Gateway-Cache den Seed berücksichtigt (V0 b).
   - **Nächster Schritt:** Review durch Roland, dann Schritt 3.
+- **2026-11-15 20:45 · Claude Desktop:** Commit `3e984dc` (Notebook, Plan, CLAUDE.md) ist gepusht. O7 entschieden:
+  `config/instantrag_s1.txt`, `config/instantrag_s2.txt` (per Skript aus S0) und `config/poc_items.json` (T1/T2, je 10
+  Aufgaben, eingefroren) angelegt; neue Doku `doc/prompt-versions.md`. V0-Befund 18:57 UTC: `qwen-3.5-35b` über
+  `llm.thalabus.ai` nicht erreichbar (LiteLLM „Connection error“, HTTP 500, auch mit Lucas unverändertem Skript);
+  `qwen-3.8-180b-next` läuft (Phase −1 per CLI erfolgreich). Luca wird am 16.11. informiert. Nächster Schritt:
+  S1/S2 im Notebook registrieren, Schritt 3 (Bewertung).
+- **2026-11-15 23:06 · Claude Code · Schritt 3 (Bewertungszellen §8 + Tests), Review durch Roland ausstehend:**
+  - **Geändert:** `proof-of-concept.ipynb` gezielt (7 bestehende Zellen geändert, 22 neu, Reihenfolge erhalten,
+    ohne Outputs). 1.4: S1/S2 in `PROMPT_PATHS` registriert, Ausgabe zusätzlich mit Datei-Prüfsumme wie in
+    `doc/prompt-versions.md`, Volltexte S1/S2. 1.9: `config/poc_items.json` nur lesend, mit Konsistenzprüfung.
+    Abschnitt 6 neu: 6.1 Regeln (die 12 freigegebenen), 6.2–6.4 Bewertung (`evaluate_run()`: Codes pro Stage und Lauf
+    aus den Rohdaten; eigene tolerante Tag-Erkennung, abgeglichen mit dem tatsächlich ausgeführten Tag; Harness-Urteil
+    aus dem Log nur daneben), 6.5–6.6 Darstellung und Statistik (Lauftabelle, `show_evaluation()`, Wilson-KI, exakter
+    McNemar ohne scipy, Balkendiagramm, Abdeckung, Codes je Schritt), 6.7 Offline-Tests, 6.8 Präsentationsansicht
+    für `results/runs.jsonl` und `results/playground.jsonl`, getrennt beschriftet. Sektion 8: Wächter („Einrichtung
+    fehlt …“) und `MODEL = "qwen-3.5-35b"` als Literal. `requirements.txt` + `matplotlib` (3.11.2 per pip im Env,
+    mit contourpy, cycler, fonttools, kiwisolver, pillow, pyparsing). Lucas Dateien unverändert, kein Commit.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerkzugriff gesperrt):** 71 Einzelprüfungen (Ganzzahl-Abgleich,
+    Tag-Arten inkl. aller Grenzfälle aus §4.3, Endantwort, Schleifen, Wilson 10/10 → [0,72; 1,00] und 8/10 →
+    [0,49; 0,94], McNemar 6:0 → p = 0,031, Aufgabenprüfung lehnt eine fehlerhafte Liste ab). 19 synthetische Läufe
+    durch das unveränderte `run_phase` und den Rekorder in eine temporäre Datei, je mit erwarteten Codes pro Stage,
+    Stufe, Harness-Urteil (Guard, „quoted“, `[halt]`) und `prefix_echo`. Darunter: Leak → funktional; einfache
+    Anführungszeichen → A-MALF + K-CORR, lenient; Kleinschreibung und `<MUL …></MUL>` → A-MALF; Platzhalter → A-META
+    (Harness: `[halt]`); `server-side-calculated="true"` → B-FORGE (Harness-Guard: „none“); Endantwort `= 180` →
+    C-FINAL (Harness: „quoted: True“); Infrastrukturfehler → I-ERR, damit ist auch der Fehlerpfad von `run_logged`
+    aus Schritt 2 getestet. Dazu `finish_reason = length` → R-LOOP, Frage außerhalb der Liste → nicht bewertbar,
+    Raten mit I-ERR, Paarung mit Mehrfachlauf und ungepaarten Aufgaben. Alle Datensätze in `results/selftest.jsonl`
+    sind strict, also funktionaler Erfolg. Ganzes Notebook (24 Code-Zellen) aus der Repo-Wurzel und aus `doc/`:
+    fehlerfrei. Sektion 8 im frischen Kernel: Eingabezelle läuft, Ausführungszelle bricht mit der Meldung ab.
+    Diagramm als PNG gerendert und angesehen. `results/`: nur `selftest.jsonl` gewachsen (8 → 12 Zeilen durch 4
+    Testläufe), `playground.jsonl` unverändert, `runs.jsonl` nicht angelegt. Kein Request an `llm.thalabus.ai`.
+  - **Befunde aus den Tests:** Der A.1-Replay (Lucas dokumentierter Lauf) ist strict, zeigt aber beschreibend
+    `prefix_echo` in Stage 2 sowie R-EMPTY und R-HIDDEN in Stage 3 (53 `completion_tokens` bei 40 sichtbaren Zeichen,
+    vgl. §4.4). Der echte Playground-Lauf `20261115T195700-8b6f5f` (HTTP 500) erscheint als I-ERR.
+  - **Nicht getestet:** Darstellung im echten Jupyter-Kernel in VS Code (HTML-Tabellen, Inline-Diagramm) → Roland;
+    echte Modellausgaben (`runs.jsonl` ist noch leer); Farbprüfung per Validator (Node.js fehlt, Farben aus einer
+    geprüften Referenzpalette).
+  - **Offen:** O11 (Präzisierungen der Regeln bestätigen). `selftest.jsonl` wächst pro Gesamtlauf um eine Zeile (O4).
+  - **Nächster Schritt:** Review durch Roland („Run All“, Abschnitte 6.7 und 6.8), dann Schritt 4 (V0).
+- **2026-11-15 23:22 · Claude Code · O11 umgesetzt (Ergänzung zu Schritt 3):**
+  - **Entscheidung Roland:** O11 bestätigt mit einer Änderung: (a) Ein Id-Verweis auf ein nicht veröffentlichtes
+    Ergebnis zählt als A-WRONG statt A-MALF; A-MALF bleibt „vom Parser nicht erkannt“. (b)–(f) wie vorgeschlagen.
+  - **Geändert (nur `proof-of-concept.ipynb`, 6 Zellen in Abschnitt 6):** neue Tag-Art `dangling` (Id-Verweis ohne
+    veröffentlichtes Ergebnis derselben Operation). Sie zählt als Tag-Versuch (also kein A-OMIT) und ergibt A-WRONG,
+    aber kein A-LEAK. Regeltabelle 6.1 und Beschreibung 6.2 angepasst.
+  - **Tests (tatsächlich ausgeführt, offline):** Einzelprüfungen angepasst (`<ADD id="add-1"/>` → dangling, neu
+    `<ADD id="mul-1"/>` → dangling): 73 OK. Neues Szenario durch das unveränderte `run_phase` (Phase −1,
+    `<MUL id="mul-1"/>` vor jeder Veröffentlichung, dann Halteantwort): genau A-WRONG, Stufe ✗; 20 Szenarien OK.
+    Ganzes Notebook aus der Repo-Wurzel und aus `doc/` fehlerfrei; nur die 6 Zellen geändert, Reihenfolge erhalten.
+    `results/`: nur `selftest.jsonl` gewachsen (12 → 14 Zeilen). Kein Request an `llm.thalabus.ai`.
+  - **Nächster Schritt:** Commit + Push (freigegeben, ohne `results/`), dann Schritt 4 (V0).
 
 ## 14. Quellen
 
