@@ -427,6 +427,23 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
     Ganzes Notebook aus der Repo-Wurzel und aus `doc/` fehlerfrei; nur die 6 Zellen geändert, Reihenfolge erhalten.
     `results/`: nur `selftest.jsonl` gewachsen (12 → 14 Zeilen). Kein Request an `llm.thalabus.ai`.
   - **Nächster Schritt:** Commit + Push (freigegeben, ohne `results/`), dann Schritt 4 (V0).
+- **2026-11-15 23:38 · Claude Code · Ergänzung zu Schritt 3: Lauf-Browser (Notebook 6.9):**
+  - **Stand vorab:** Commit `6cbdc78` (Bewertung, S1/S2, Wächter, O11 mit (a) als A-WRONG) ist gepusht. Rolands
+    „Run All“ danach: 73 Einzelprüfungen und 20 Szenarien OK.
+  - **Geändert (nur `proof-of-concept.ipynb`, 3 neue Zellen am Ende von Abschnitt 6, übrige unverändert):** Zelle 1
+    mit `QUELLE = "playground" | "selftest" | "runs"` liest die passende Datei unter `results/` nur lesend und
+    ungefiltert und listet die Läufe nummeriert (Nr. = Index in `records`; run_id, Modell, Phase, Frage, Fehler,
+    korrekt ✓/✗ aus der Bewertung, „–“ solange nicht bewertbar). Fehlt die Datei, gibt es einen Hinweis statt eines
+    Fehlers. Zelle 2 enthält auskommentiert `show_run(records[0])` und `show_evaluation(records[0])` mit Kurzanleitung.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt):** `playground`: 1 Lauf mit
+    „HTTPError: HTTP Error 500 …“, korrekt „–“. `selftest`: alle Läufe korrekt ✓. `runs`: Hinweis
+    „results/runs.jsonl existiert noch nicht“, `records` leer. Unbekannte `QUELLE` bricht mit einer Meldung ab, die
+    die erlaubten Werte nennt. `show_run`/`show_evaluation` für `records[0]` laufen. Zelle 2 läuft ohne Wirkung.
+    Ganzes Notebook (26 Code-Zellen) aus der Repo-Wurzel und aus `doc/` fehlerfrei. `results/`: nur
+    `selftest.jsonl` gewachsen (14 → 18 Zeilen; davon 3 aus diesen Tests, 1 vermutlich aus Rolands „Run All“).
+    Kein Request an `llm.thalabus.ai`, kein Commit.
+  - **Nächster Schritt:** Commit + Push nach Klärung der Message (die Teile außer dem Lauf-Browser sind bereits
+    in `6cbdc78`), dann Schritt 4 (V0).
 
 ## 14. Quellen
 
