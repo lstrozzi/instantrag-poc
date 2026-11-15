@@ -51,6 +51,8 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | 2026-11-15 | Python-Umgebung: Conda-Env `instantrag` mit Python 3.11 statt `.venv` (Lösungsweg Schritt 1). | `python` ist außerhalb der Anaconda Prompt nicht im PATH; ein venv aus Anacondas Python hat unter Windows bekannte SSL-/DLL-Ladeprobleme, der Harness braucht aber HTTPS. 3.11 wie in Lucas Umgebung (`cpython-311` im Git-Verlauf). Claude Code aus der aktivierten Anaconda Prompt starten. |
 | 2026-11-15 | Bewertungsregeln für Schritt 3 freigegeben (12 Regeln, im Notebook Abschnitt 6.1). | Grundlage aller Codes und Erfolgsstufen; Präzisierungen aus der Umsetzung offen als O11. |
 | 2026-11-15 | `matplotlib` als neue Abhängigkeit (Balkendiagramm der Erfolgsraten mit Wilson-KI). | Per pip im Env `instantrag` installiert und in `requirements.txt` eingetragen. |
+| 2026-11-15 | Ein Stream ohne `finish_reason` und ohne abgefangenen Tag (Fehler-Chunk des Gateways, abgerissener Stream) zählt als I-ERR, nicht als A-OMIT; kein neuer Code (Review, E-1). | Infrastrukturfehler dürfen nicht in H1/H2 einfließen. Der Harness schickt nach einem leeren Stream trotzdem seinen Korrektur-Prompt; der Lauf bleibt I-ERR. |
+| 2026-11-15 | Raten zählen je Experiment und Aufgabe nur den ersten gültigen Lauf (ohne I-ERR); weitere Läufe werden ausgewiesen (Review, E-2). | Deckungsgleich mit der McNemar-Paarung; ein erneutes Ausführen bläht n nicht auf. |
 
 ## 3. Offene Entscheidungen (vor der Umsetzung klären)
 
@@ -67,6 +69,9 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | O9 | RESULTS-Platzierung: Roland erinnert eine Absprache mit Luca „als System-Nachricht“. Laut `instantrag.md` §2/§7 lehnt das Gateway System-Nachrichten außerhalb von Position 0 ab (HTTP 400). | Montag in Rolle `user` wie in Lucas Harness (Replikation); S1/S2 beschreiben RESULTS rollenneutral als Server-Nachricht; Variante „RESULTS im System-Inhalt an Position 0“ als E7 nach Klärung mit Luca (§11) | offen |
 | O10 | Resume-Präfix: Roland schlägt `<thinking>…</thinking>` statt `<\|im_start\|>` vor. | Protokoll nicht umschreiben: `<\|im_start\|>` ist der ChatML-Nachrichtenstart, Qwens Thinking-Block ist `<think>…</think>`, ein schließendes Tag würde das Thinking beenden. V0 (c) testet `<\|im_start\|>` / `<think>` / ohne Präfix; im Notebook wird der Reasoning-Kanal als „Thinking“ beschriftet | offen |
 | O11 | Präzisierungen der Bewertungsregeln aus Schritt 3 (Notebook 6.1): (a) Id-Verweis auf eine nicht veröffentlichte Id = A-WRONG (Vorschlag war A-MALF; A-MALF bleibt „vom Parser nicht erkannt“); (b) `18.5` und `0.18` zählen nicht als 18; (c) Soll-Argumente von Call 2 mit dem tatsächlich veröffentlichten Wert (relevant für E6); (d) C-FINAL auch für eine vorzeitige Antwort mit Zahl in Phase −3; (e) jeder Call nach beiden Ergebnissen = A-WRONG; (f) „korrekt“ in Phase −1/−2 = ausgeführte Calls wie erwartet | bestätigen | entschieden 15.11.: (a) als A-WRONG, (b)–(f) wie vorgeschlagen |
+| O12a | Endantwort-Regel (Notebook 6.2 `final_value`: Zahl nach dem letzten „=“): `13 + (6 * 7) = 55, because 6 * 7 = 42` ergibt Endwert 42 und C-FINAL, obwohl die Antwort stimmt (Review 15.11., offline belegt). | C-FINAL nur, wenn der Sollwert nirgends als ganze Zahl steht oder eine andere Zahl als Ergebnis behauptet wird; solche Fälle in die Handprüfung | offen – noch nicht umgesetzt |
+| O12b | A-MALF bei zitierter Tag-Syntax: Thinking mit `<ADD x1="..." x2="..." [...] xn="..."/>` (Zitat aus dem Systemprompt) und danach korrektem, ausgeführtem Call ergibt A-MALF und Stufe ✗; ein Rückblick auf den Call im Thinking der Endantwort ergibt A-WRONG (Review 15.11., offline belegt). | A-MALF nur als Fehler, wenn in der Stage kein gültiger Call ausgeführt wurde, sonst beschreibend; für den Rückblick in der Endantwort analog entscheiden | offen – noch nicht umgesetzt |
+| O12c | B-PREM erkennt nur den richtigen Sollwert: eine vorzeitige falsche Zahl („The result is 61.“) und `42.0` bleiben unerkannt; `<MUL x1="6" x2="7" result="42"/>` gilt als strict (nur B-SELF). H3 kann so 0 Fälle melden (Review 15.11., offline belegt). | B-PREM für jede Zahl im Antwortkanal einer Nicht-End-Stage, die weder aus der Frage noch aus RESULTS stammt; Zahl in einem Zusatzattribut als B-FORGE | offen – noch nicht umgesetzt |
 
 ## 4. Befundlage (Analyse 2026-11-14)
 
@@ -204,7 +209,8 @@ ist fest (innerste zuerst).
 - **C:** C-IGNORE Serverwert nicht oder falsch übernommen · C-FINAL Endantwort ≠ letzter Serverwert oder ≠ richtiges Ergebnis
 - **Sonstiges:** R-EMPTY Reasoning leer · R-HIDDEN `completion_tokens` > sichtbare Zeichen (nur abgeschlossene
   Streams) · R-LOOP `finish_reason = length` oder Wiederholungsschleife · K-CORR Korrektur nötig ·
-  I-ERR Infrastruktur (HTTP, Timeout, Cache-Treffer) – getrennt berichtet
+  I-ERR Infrastruktur (HTTP, Timeout, Abbruch, Stream ohne `finish_reason` und ohne abgefangenen Tag,
+  Cache-Treffer – Letzterer aus den Rohdaten bisher nicht erkennbar) – getrennt berichtet
 
 **Erfolgsstufen:** **strict** – alles korrekt, kein Leak, keine Korrektur · **funktional** – Leak erlaubt,
 keine Korrektur (Hauptmaßstab, weil der Harness Leaks verarbeitet; „strict“ ist die RQ3-Sicht) ·
@@ -444,6 +450,31 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
     Kein Request an `llm.thalabus.ai`, kein Commit.
   - **Nächster Schritt:** Commit + Push nach Klärung der Message (die Teile außer dem Lauf-Browser sind bereits
     in `6cbdc78`), dann Schritt 4 (V0).
+- **2026-11-15 23:58 · Claude Code · Unabhängiger Review + Paket A (Robustheit, Datenhygiene):**
+  - **Review (nur lesend, offline):** Rekorder stimmt mit dem HTTP-Body überein; Lucas Dateien seit `6e222dc`
+    unverändert; Wilson-KI, McNemar und alle 20 Sollwerte nachgerechnet; API-Key in keiner Arbeitsdatei und nicht in
+    der Git-Historie. Funde: Stream-Fehler zählten als A-OMIT (kritisch); drei Fehleinstufungen der Bewertung
+    (→ O12a–c, offen); Wiederholungen in den Raten; abgebrochene Läufe gingen verloren; kein p-Wert-Schutz ohne Paare.
+  - **Entscheidungen Roland:** E-1 Stream ohne `finish_reason` = I-ERR; E-2 Raten nur über den ersten gültigen Lauf
+    je Experiment und Aufgabe (§2).
+  - **Geändert (nur `proof-of-concept.ipynb`, 9 Zellen, Reihenfolge erhalten, ohne Outputs):** 6.1/6.3: Stream ohne
+    `finish_reason` und ohne abgefangenen Tag → I-ERR, Status des Laufs I-ERR, keine weiteren Codes für die Stage.
+    1.6: Rekorder und `run_logged` fangen `BaseException`; der Datensatz wird geschrieben, danach wird der Abbruch
+    weitergereicht. 6.6: `first_valid_runs()`, Raten nur über den ersten gültigen Lauf, neue Spalte „weitere Läufe“;
+    ohne Paare `p = None` („–“). 1.8: Metadaten-Assert verträgt fehlendes Git. 6.7: neue Tests. Plan §2, §3 (O12), §8.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt):** ganzes Notebook (26 Code-Zellen) aus der
+    Repo-Wurzel und aus `doc/` fehlerfrei: 73 Einzelprüfungen, 22 Szenarien (neu: Fehler-Chunk im Stream → I-ERR in
+    beiden Requests trotz Korrektur-Prompt; abgerissener Stream → I-ERR), abgebrochener Lauf (KeyboardInterrupt im
+    2. Request: eine Zeile geschrieben, 2 Turns, Status I-ERR, Abbruch weitergereicht), Raten (13 Läufe einer Aufgabe
+    in einem Experiment → n = 1, 10 weitere; als getrennte Experimente n = 11 wie bisher), Vergleich ohne Paare →
+    kein p-Wert. Zusätzlich auf einer Kopie ohne `.git`: Selbsttest OK. `results/`: nur `selftest.jsonl` gewachsen
+    (18 → 20 Zeilen), `runs.jsonl` nicht angelegt. Kein Request an `llm.thalabus.ai`.
+  - **Nicht getestet:** echte Gateway-Fehler-Chunks (Format des Mocks ist angenommen); Kernel-Stopp in VS Code;
+    Darstellung der neuen Spalte im Jupyter-Kernel.
+  - **Offen:** O12a–c (Bewertungsregeln); Experiment-Register, Seed-Regel und Schleife (Notebook 5); Response-Header
+    für den Cache-Test (mit V0); O4 (`results/` nur lokal, kein Backup); M1 nicht erreichbar; Notebook §0
+    (Schwellen) noch leer; Text-Hashes in `doc/prompt-versions.md`.
+  - **Nächster Schritt:** O12a–c entscheiden, dann Schritt 4 (V0) bzw. Experiment-Register.
 
 ## 14. Quellen
 
