@@ -53,6 +53,10 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | 2026-11-15 | `matplotlib` als neue Abhängigkeit (Balkendiagramm der Erfolgsraten mit Wilson-KI). | Per pip im Env `instantrag` installiert und in `requirements.txt` eingetragen. |
 | 2026-11-15 | Ein Stream ohne `finish_reason` und ohne abgefangenen Tag (Fehler-Chunk des Gateways, abgerissener Stream) zählt als I-ERR, nicht als A-OMIT; kein neuer Code (Review, E-1). | Infrastrukturfehler dürfen nicht in H1/H2 einfließen. Der Harness schickt nach einem leeren Stream trotzdem seinen Korrektur-Prompt; der Lauf bleibt I-ERR. |
 | 2026-11-15 | Raten zählen je Experiment und Aufgabe nur den ersten gültigen Lauf (ohne I-ERR); weitere Läufe werden ausgewiesen (Review, E-2). | Deckungsgleich mit der McNemar-Paarung; ein erneutes Ausführen bläht n nicht auf. |
+| 2026-11-16 | **Bewusste Abweichung von §7:** zusätzliches Experiment **E1b** = S0 · `qwen-3.8-180b-next` (M2) · T1 · Phase −3 als Ersatz-Vergleich, weil M1 (`qwen-3.5-35b`) nicht erreichbar ist. | Vergleich E1b → E4 (Prompt S0 → S1 auf M2) ersetzt vorerst E1 → E2. E1/E2 bleiben registriert und laufen, sobald M1 antwortet. Aussagen gelten dann für M2, nicht für Lucas Referenzmodell. |
+| 2026-11-16 | Seed fest je Aufgabe und in allen Experimenten gleich (T1-01 → 101 … T2-10 → 210). | Gepaarte Läufe unterscheiden sich nur im untersuchten Faktor; jeder Request-Body bleibt eindeutig (Prompt, Modell oder Aufgabe verschieden). |
+| 2026-11-16 | V0 läuft nicht vor den ersten Experimenten. | Zeitgründe (Meeting 16.11.). Ein Body-basierter Cache kann keine alten Antworten liefern, weil kein Request-Body doppelt vorkommt; V0 (c) betrifft nur die Deutung und wird nachgeholt. |
+| 2026-11-16 00:25 | O4: Repo ist privat (nur Roland und Luca) → `results/runs.jsonl` und `results/playground.jsonl` werden committet; `results/selftest.jsonl` bleibt lokal (`.gitignore`). | Rohdaten der Experimente gehören zum Reproduzierbarkeitspaket; Selbsttest-Zeilen entstehen bei jedem „Run All“ und sind keine Daten. |
 
 ## 3. Offene Entscheidungen (vor der Umsetzung klären)
 
@@ -61,7 +65,7 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | O1 | Ein Notebook mit Abschnitt pro Phase oder drei Notebooks? | Ein Notebook – Phasen sind kumulativ, Setup/Auswertung nur einmal | entschieden 15.11. (§2) |
 | O2 | Notebook-Design §9 und Schritte 2–3 freigeben? | ja | entschieden 15.11. (§2) |
 | O3 | Referenzmodell M1 | `qwen-3.5-35b` (Lucas dokumentierte Läufe) | entschieden 15.11. (§2) |
-| O4 | Rohdaten `results/` ins Repo committen? | ja (Reproduzierbarkeitspaket laut Exposé); vorher mit Luca klären, ob das Repo privat ist | offen |
+| O4 | Rohdaten `results/` ins Repo committen? | ja (Reproduzierbarkeitspaket laut Exposé); vorher mit Luca klären, ob das Repo privat ist | entschieden 16.11. 00:25 (§2): Repo privat; `runs.jsonl` und `playground.jsonl` committen, `selftest.jsonl` lokal |
 | O5 | `ipykernel` und `pandas` in `requirements.txt` aufnehmen? | ja | entschieden 15.11. (§2) |
 | O6 | Erfolgsschwellen H1 (Vorschlag: ≥ 8/10 gestützt, ≤ 5/10 geschwächt) | vor E1 mit Datum im Notebook §0 fixieren | entschieden 15.11. (§2) |
 | O7 | Wortlaut der Prompt-Varianten S1/S2 | Entwurf in Schritt 5, Freigabe durch Roland | entschieden 15.11. 20:41 – Dateien angelegt, siehe `doc/prompt-versions.md` |
@@ -475,6 +479,40 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
     für den Cache-Test (mit V0); O4 (`results/` nur lokal, kein Backup); M1 nicht erreichbar; Notebook §0
     (Schwellen) noch leer; Text-Hashes in `doc/prompt-versions.md`.
   - **Nächster Schritt:** O12a–c entscheiden, dann Schritt 4 (V0) bzw. Experiment-Register.
+- **2026-11-16 09:36 · Claude Code · Experiment-Schleife (Notebook 5), Review durch Roland ausstehend:**
+  - **Entscheidungen Roland (§2):** E1b als Ersatz-Vergleich auf M2; Seed fest je Aufgabe; V0 nicht vor den ersten
+    Experimenten; ist M1 nicht erreichbar, laufen heute nur E1b und E4.
+  - **Geändert (nur `proof-of-concept.ipynb`: 2 Zellen geändert, 6 neu, Reihenfolge erhalten, ohne Outputs):**
+    Abschnitt 5 mit Register (E1, E1b, E2, E4 aktiv; E3, E5 registriert, nicht freigegeben), `experiment_plan()`
+    (Vorschau; Aufgaben mit gültigem Lauf im selben Experiment werden übersprungen) und `run_experiments()` (ein Lauf
+    je Aufgabe über `run_logged`, Phase −3, Ziel `results/runs.jsonl`, `expected.item_id`, Abbruch eines Experiments
+    nach 2 I-ERR in Folge). Schalter heißt `RUN_EXPERIMENTE` (nicht `RUN`), damit er sich nicht mit dem Schalter
+    des Playgrounds (Sektion 8) überschneidet. Playground- und Selbsttest-Datei werden als Ziel abgewiesen.
+    6.6: Vergleich E1b → E4 in `PLANNED_COMPARISONS`. 6.7: Abgleich der I-ERR-Prüfung der Schleife mit `evaluate_run`.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt):** Schleife mit dem Mock aus 1.8 in eine temporäre
+    Datei: Vorschau sendet und schreibt nichts; E4 → 10 Läufe, 30 Requests, je Lauf Experiment, Modell, S1-Text,
+    Frage und Seed im Request-Body geprüft, `expected.item_id` passt zur Frage; zweiter Durchgang sendet nichts;
+    E1b mit denselben Seeds und S0; Ausfall (jeder Request schlägt fehl) → E1 stoppt nach 2 I-ERR, Aufgaben bleiben
+    offen; unbekanntes und nicht freigegebenes Experiment sowie Playground-Datei abgewiesen; übergebene Config
+    unverändert. I-ERR-Prüfung stimmt auf 44 Datensätzen mit `evaluate_run` überein. Ganzes Notebook (30 Code-Zellen)
+    aus Repo-Wurzel und aus `doc/` fehlerfrei (73 Einzelprüfungen, 22 Szenarien). `results/`: nur `selftest.jsonl`
+    gewachsen (21 → 23), `runs.jsonl` nicht angelegt. Kein Request an `llm.thalabus.ai`, kein Commit.
+  - **Nicht getestet:** echter Lauf; Darstellung der Vorschau im Jupyter-Kernel. Der Mock spielt für jede Aufgabe
+    den A.1-Lauf ab, er prüft die Zuordnung, nicht das Modell.
+  - **Offen:** O12a–c (Bewertung vorläufig, Rohdaten davon unberührt); V0; M1-Erreichbarkeit; O4.
+  - **Nächster Schritt:** Roland: `RUN_EXPERIMENTE = True` für E4 und E1b, danach Auswertung 6.8; dann O12a–c.
+- **2026-11-16 10:38 · Claude Code · Erste Experimentläufe und O4:**
+  - **Läufe (Roland, live):** E4 (S1) und E1b (S0) auf `qwen-3.8-180b-next`, je 10 Aufgaben T1, Phase −3, Seeds
+    101–110; 20 Läufe in `results/runs.jsonl`, 08:41–08:46 UTC (09:41–09:46 Europe/Berlin), keiner mit Fehler im
+    Datensatz. Auswertung im Notebook 6.8 vorläufig, solange O12a–c offen sind.
+  - **O4 entschieden (16.11. 00:25, §2):** Repo privat → `results/runs.jsonl` und `results/playground.jsonl` werden
+    committet, `results/selftest.jsonl` bleibt lokal und steht in `.gitignore`.
+  - **Neu von Roland:** `results/show_runs.py` (Schnellansicht nur lesend: Übersicht, Detail, JSON, HTML) und
+    `results/runs_view.html` (erzeugte Ansicht der 20 Läufe). Geprüft: Skript liest nur und schreibt allein die
+    HTML-Datei; API-Key in keiner der committeten Dateien.
+  - **Offen:** O12a–c; V0; M1-Erreichbarkeit (E1/E2); Docstring von `show_runs.py` nennt `run_view.html`, das Skript
+    schreibt `runs_view.html`.
+  - **Nächster Schritt:** Auswertung E1b → E4 im Projekt-Chat, dann O12a–c.
 
 ## 14. Quellen
 
