@@ -591,6 +591,33 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
     Mock-Schleife mit S3-Volltext, geschützte Dateien unverändert. Kein Request an `llm.thalabus.ai`.
   - **Offen:** Das Löschen von `results/show_one_run.txt` ist weiterhin nicht committet (nicht Teil dieses Schritts).
   - **Nächster Schritt:** Freigabe des Laufs E7 durch Roland.
+- **2026-11-16 19:13 · Claude Code · Schritt A: Export 6.10 lesbarer, Review durch Roland ausstehend:**
+  - **Stand vorab:** Roland hat E7 ausgeführt. `runs.jsonl` hat jetzt 30 Zeilen; geprüft, dass nur angehängt wurde
+    (+10, −0). E7 vorläufig: ok 3 · ok_nach_korrektur 2 · abbruch_dep 4 · keine_antwort 1.
+  - **Geändert:**
+    - Notebook, nur die Zellen 6.10 (Markdown und Code):
+      - Alle Export-CSVs mit `;`, Dezimalkomma und UTF-8 mit BOM, weiterhin deterministisch.
+      - `failed_runs.csv` hat jetzt kurze Spalten: Nr (Index in `runs.jsonl`) · Zeit (Europe/Berlin) · Experiment ·
+        Prompt · Aufgabe · Erwartet · Antwort · Ergebnis · gescheitert in Stufe · Code (Codes dieser Stufe) ·
+        Grund (≤ 80 Zeichen). Die Spalten `run_id` und `auszug` sind entfallen; Volltexte gibt es in
+        `runs_failed_view.html`, `run_id` und vollen Grund in `run_summary.csv`.
+      - Neu `results/task_matrix.csv`: Aufgaben × Experimente in Register-Reihenfolge, Zelle = Kategorie des ersten
+        gültigen Laufs. Im Notebook erscheint sie als farbige HTML-Tabelle; `jinja2` fehlt im Env, deshalb ohne
+        pandas-Styler und ohne neue Abhängigkeit.
+    - `results/show_runs.py` liest `run_summary.csv` mit `;` und erkennt das alte Komma-Format an der Kopfzeile.
+      CSVs und HTML-Ansichten sind neu erzeugt.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt):**
+    - Ganzes Notebook aus der Repo-Wurzel und aus `doc/` fehlerfrei.
+    - Alle vier CSVs mit BOM und `;`. Kopfzeile von `failed_runs.csv` wörtlich geprüft; 26 Zeilen, Grund ≤ 80
+      Zeichen, chronologisch; jede Nr verweist auf einen Lauf mit passendem Experiment und passender Aufgabe.
+    - Raten mit Dezimalkomma. Matrix 10 × (E1b, E4, E7).
+    - Kategorien von E1b und E4 unverändert gegenüber 12:03.
+    - Zweiter Export bytegleich.
+    - `show_runs.py`: Übersicht, `--failed` (26 von 30) und `--html` (normal und `--failed`); Lesen mit `;` und mit
+      altem Komma-Format.
+    - Rohdaten, `poc_items.json`, S0–S3 und Lucas Dateien unverändert (SHA-256). Kein Request.
+  - **Nicht getestet:** Öffnen der CSVs in Excel; Darstellung der Matrix im Jupyter-Kernel in VS Code.
+  - **Nächster Schritt:** Schritt B (Testsuites), dann Commit von A und B getrennt nach Freigabe.
 
 ## 14. Quellen
 

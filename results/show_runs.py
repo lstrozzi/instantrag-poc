@@ -32,7 +32,11 @@ def load_summary():
     if not SUMMARY.exists():
         return {}
     with SUMMARY.open(encoding="utf-8-sig", newline="") as f:
-        return {row["run_id"]: row for row in csv.DictReader(f)}
+        header = f.readline()
+        f.seek(0)
+        # current export: ";" (German Excel); older exports used ","
+        delimiter = ";" if header.count(";") > header.count(",") else ","
+        return {row["run_id"]: row for row in csv.DictReader(f, delimiter=delimiter)}
 
 
 EXPORT = {}  # filled in main from run_summary.csv
