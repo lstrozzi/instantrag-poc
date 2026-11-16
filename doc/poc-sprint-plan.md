@@ -56,6 +56,7 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | 2026-11-16 | **Bewusste Abweichung von §7:** zusätzliches Experiment **E1b** = S0 · `qwen-3.8-180b-next` (M2) · T1 · Phase −3 als Ersatz-Vergleich, weil M1 (`qwen-3.5-35b`) nicht erreichbar ist. | Vergleich E1b → E4 (Prompt S0 → S1 auf M2) ersetzt vorerst E1 → E2. E1/E2 bleiben registriert und laufen, sobald M1 antwortet. Aussagen gelten dann für M2, nicht für Lucas Referenzmodell. |
 | 2026-11-16 | Seed fest je Aufgabe und in allen Experimenten gleich (T1-01 → 101 … T2-10 → 210). | Gepaarte Läufe unterscheiden sich nur im untersuchten Faktor; jeder Request-Body bleibt eindeutig (Prompt, Modell oder Aufgabe verschieden). |
 | 2026-11-16 | V0 läuft nicht vor den ersten Experimenten. | Zeitgründe (Meeting 16.11.). Ein Body-basierter Cache kann keine alten Antworten liefern, weil kein Request-Body doppelt vorkommt; V0 (c) betrifft nur die Deutung und wird nachgeholt. |
+| 2026-11-16 12:12 | Neue Prompt-Version S3 (Basis S2) als bewusst gebündeltes Paket (Ziel: Erfolgsrate): Regel 3 = Reihenfolge-Regel (ersetzt die S2-Erstschritt-Regel), Regel 4 (Kanalregel) bleibt, neue Regel 5 = Abschlussregel, Beispiele „Server:“ → „System:“ (Lucas Vorgabe). Neues Experiment E7 = S3 · M2 · T1 · Phase −3, gleiche Seeds; Vergleiche E4 → E7 und E1b → E7. Die bisher für O9 reservierte ID E7 heißt jetzt E8. | Anlass: Fehlerbilder aus E1b/E4 (`abbruch_dep`, Hold-Message trotz vollständiger RESULTS). Eine Wirkung lässt sich keiner Einzeländerung zuordnen. Die Reihenfolge-Regel ist so formuliert, dass sie Beispiel A nicht widerspricht. S1/S2 bleiben unverändert. Lauf nur nach Rolands Freigabe. |
 | 2026-11-16 00:25 | O4: Repo ist privat (nur Roland und Luca) → `results/runs.jsonl` und `results/playground.jsonl` werden committet; `results/selftest.jsonl` bleibt lokal (`.gitignore`). | Rohdaten der Experimente gehören zum Reproduzierbarkeitspaket; Selbsttest-Zeilen entstehen bei jedem „Run All“ und sind keine Daten. |
 
 ## 3. Offene Entscheidungen (vor der Umsetzung klären)
@@ -70,7 +71,7 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | O6 | Erfolgsschwellen H1 (Vorschlag: ≥ 8/10 gestützt, ≤ 5/10 geschwächt) | vor E1 mit Datum im Notebook §0 fixieren | entschieden 15.11. (§2) |
 | O7 | Wortlaut der Prompt-Varianten S1/S2 | Entwurf in Schritt 5, Freigabe durch Roland | entschieden 15.11. 20:41 – Dateien angelegt, siehe `doc/prompt-versions.md` |
 | O8 | `CLAUDE.md` committen? Gilt dann für alle Claude-Code-Nutzer des Repos, auch Luca. | ja, Luca kurz informieren | entschieden 15.11. (§2): Commit erst nach der Worksession |
-| O9 | RESULTS-Platzierung: Roland erinnert eine Absprache mit Luca „als System-Nachricht“. Laut `instantrag.md` §2/§7 lehnt das Gateway System-Nachrichten außerhalb von Position 0 ab (HTTP 400). | Montag in Rolle `user` wie in Lucas Harness (Replikation); S1/S2 beschreiben RESULTS rollenneutral als Server-Nachricht; Variante „RESULTS im System-Inhalt an Position 0“ als E7 nach Klärung mit Luca (§11) | offen |
+| O9 | RESULTS-Platzierung: Roland erinnert eine Absprache mit Luca „als System-Nachricht“. Laut `instantrag.md` §2/§7 lehnt das Gateway System-Nachrichten außerhalb von Position 0 ab (HTTP 400). | Montag in Rolle `user` wie in Lucas Harness (Replikation); S1/S2 beschreiben RESULTS rollenneutral als Server-Nachricht; Variante „RESULTS im System-Inhalt an Position 0“ als E8 nach Klärung mit Luca (§11; bis 16.11. als E7 geführt, die ID ging an S3) | offen |
 | O10 | Resume-Präfix: Roland schlägt `<thinking>…</thinking>` statt `<\|im_start\|>` vor. | Protokoll nicht umschreiben: `<\|im_start\|>` ist der ChatML-Nachrichtenstart, Qwens Thinking-Block ist `<think>…</think>`, ein schließendes Tag würde das Thinking beenden. V0 (c) testet `<\|im_start\|>` / `<think>` / ohne Präfix; im Notebook wird der Reasoning-Kanal als „Thinking“ beschriftet | offen |
 | O11 | Präzisierungen der Bewertungsregeln aus Schritt 3 (Notebook 6.1): (a) Id-Verweis auf eine nicht veröffentlichte Id = A-WRONG (Vorschlag war A-MALF; A-MALF bleibt „vom Parser nicht erkannt“); (b) `18.5` und `0.18` zählen nicht als 18; (c) Soll-Argumente von Call 2 mit dem tatsächlich veröffentlichten Wert (relevant für E6); (d) C-FINAL auch für eine vorzeitige Antwort mit Zahl in Phase −3; (e) jeder Call nach beiden Ergebnissen = A-WRONG; (f) „korrekt“ in Phase −1/−2 = ausgeführte Calls wie erwartet | bestätigen | entschieden 15.11.: (a) als A-WRONG, (b)–(f) wie vorgeschlagen |
 | O12a | Endantwort-Regel (Notebook 6.2 `final_value`: Zahl nach dem letzten „=“): `13 + (6 * 7) = 55, because 6 * 7 = 42` ergibt Endwert 42 und C-FINAL, obwohl die Antwort stimmt (Review 15.11., offline belegt). | C-FINAL nur, wenn der Sollwert nirgends als ganze Zahl steht oder eine andere Zahl als Ergebnis behauptet wird; solche Fälle in die Handprüfung | offen – noch nicht umgesetzt |
@@ -162,7 +163,9 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
 **Faktoren**
 - **S0** `config/instantrag.txt` unverändert · **S1** S0 ohne Widersprüche (Attribut-Block und Injektionssatz
   raus, Regel 2: Zahlen aus Frage oder `<RESULTS>`, Beispiel B korrigiert, RESULTS rollenneutral als „Server“, Ausführender „server“ statt „user“), sonst
-  wortgleich · **S2** S1 + Erstschritt-Regel + Kanalregel (zwei Änderungen gebündelt → bei Wirkung Einzeltest).
+  wortgleich · **S2** S1 + Erstschritt-Regel + Kanalregel (zwei Änderungen gebündelt → bei Wirkung Einzeltest) ·
+  **S3** (16.11.) S2 mit Reihenfolge-Regel statt Erstschritt-Regel + Abschlussregel + Beispiele „System:“; bewusst
+  gebündeltes Paket mit dem Ziel Erfolgsrate (Details `doc/prompt-versions.md`).
 - **M1** `qwen-3.5-35b` · **M2** `qwen-3.8-180b-next` · M3 kleineres Modell, falls verfügbar.
 - **T1** 10 Aufgaben a+(b·c) inkl. Referenz `10+(2*4)` (z. B. 13+(6*7), 21+(4*9)) · **T2** 10 Aufgaben a·(b+c)
   (z. B. 7*(4+9), 4*(9+8)). Regeln: ganze Zahlen; keine 0 oder 1 als Operand; Zwischen- und Endergebnis
@@ -178,6 +181,8 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
 | E3 | bis Mi | Prompt S1→S2 | S2 | M1 | T1 | 10 | E2, gleiche Aufgaben |
 | E5 | bis Mi | Aufgabentyp T1→T2 | S1 | M1 | T2 | 10 | E2 |
 | E6 | optional bis Fr | Server liefert falsche Werte (Eingriff von außen) | S1 | M1 | T1 | 10 | E2 |
+| E7 | ab 16.11., nach Freigabe | Prompt-Paket S3 (16.11.) | S3 | M2 | T1 | 10 | E4 (S1 → S3), E1b (S0 → S3), gleiche Aufgaben und Seeds |
+| E8 | nach Klärung mit Luca | RESULTS im System-Inhalt an Position 0 (O9) | – | – | T1 | 10 | offen |
 
 **V0 im Detail:** (a) `/v1/models` abfragen; (b) Cache: Referenz-Request zweimal identisch, dann mit anderem
 `seed` – Inhalt, Usage, Antwortzeit und Header `x-litellm-cache-key` vergleichen (bei T = 0,1 sind gleiche
@@ -548,6 +553,44 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
     `playground.jsonl` mit +1 Zeile, `show_one_run.txt` gelöscht, `show_one_run.json` neu.
   - **Offen:** O12a–d. Playground-Läufe sind nicht im Export.
   - **Nächster Schritt:** Review des Exports durch Roland/Luca, dann O12a–d.
+- **2026-11-16 12:20 · Claude Code · Commit Export + Prompt S3 und Experiment E7, Review durch Roland ausstehend:**
+  - **Commit:** Der Export-Schritt ist als `eb2b3d5` „Add failure export with reasons“ gepusht, inklusive
+    `playground.jsonl` (+1 Zeile). Nicht im Commit sind `show_one_run.json` (neu) und das Löschen von `show_one_run.txt`.
+  - **Entscheidungen Roland (§2):** S3 auf Basis S2 als gebündeltes Paket. D1: E7 = S3, die O9-Variante heißt jetzt E8.
+    D2: Reihenfolge-Regel in meiner Formulierung (passt zu Beispiel A). D3: „System:“ mit Begründung.
+  - **Geändert:**
+    - `config/instantrag_s3.txt` neu, per Skript aus S2 (Bytes, CRLF erhalten, Trefferzahl je Ersetzung geprüft).
+      Der Diff gegen S2 zeigt genau Regel 3 ersetzt, Regel 5 neu und 2× „Server:“ → „System:“.
+    - `doc/prompt-versions.md`: Zeile S3 (Datei-Hash `f6c7b3e46bad2a04`) und Abschnitt S3 mit Tabelle. Dort steht auch,
+      dass der S2-Halbsatz „never describe or compute a step in prose …“ mit der alten Regel 3 entfällt.
+    - Notebook, 5 Zellen gezielt geändert: 1.4 `PROMPT_PATHS` + S3, Volltext-Überschrift und -Zelle + S3, Register +
+      E7 (aktiv, `RUN_EXPERIMENTE` bleibt `False`), 6.6 `PLANNED_COMPARISONS` + E4 → E7 und E1b → E7.
+    - Plan §2, §3 (O9: E7 → E8), §7 (S3, Zeilen E7/E8).
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt):**
+    - Ganzes Notebook (31 Code-Zellen) aus der Repo-Wurzel und aus `doc/` fehlerfrei. 1.4 zeigt S3 mit Datei-Hash.
+    - `experiment_plan(["E7"])` auf den echten Daten: 10 offene Aufgaben T1, S3, `qwen-3.8-180b-next`, Seeds 101–110,
+      gleich denen von E4.
+    - Mock-Schleife E7 in eine temporäre Datei: 10 Läufe, 30 Requests, jeder Request-Body mit S3-Volltext, M2 und Seed,
+      `prompt_sha256` = S3.
+    - Gepaarte Vergleiche E4 → E7 und E1b → E7 mit den Mock-Daten: je 10 Paare, laufen fehlerfrei.
+    - S0/S1/S2, Lucas Dateien, `runs.jsonl` und `playground.jsonl` unverändert (SHA-256). Die Export-CSVs sind nach
+      dem Notebook-Lauf unverändert. Kein Request an `llm.thalabus.ai`.
+  - **Nicht getestet:** echte Modellausgaben mit S3 (Lauf E7 braucht Rolands Freigabe).
+  - **Offen:** O12a–d. Die Wirkung von S3 lässt sich keiner Einzelregel zuordnen. S3 beschriftet RESULTS als „System:“,
+    der Harness sendet aber Rolle `user`.
+  - **Nächster Schritt:** Roland gibt E7 frei → `EXPERIMENTE = ["E7"]`, `RUN_EXPERIMENTE = True`, danach Export 6.10.
+- **2026-11-16 12:30 · Claude Code · S3 Regel 3 ergänzt, Commit S3/E7:**
+  - **Geändert:**
+    - `config/instantrag_s3.txt`, Regel 3: Der S2-Halbsatz „; never describe or compute a step in prose instead of
+      emitting its tag.“ ist wieder angehängt (Bytes, CRLF erhalten). Das geschah vor jedem Lauf mit S3, es gibt also
+      keine Läufe mit der alten Fassung. Neuer Datei-Hash `25b1074a77b4e168`.
+    - `doc/prompt-versions.md`: Hash und Änderungstabelle angepasst.
+    - `.gitignore` + `results/show_one_run.json`. Die Datei ist ignoriert, nicht gelöscht.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt):** dieselben S3/E7-Prüfungen wie 12:20, neu mit
+    Hash- und Halbsatz-Prüfung: ganzes Notebook aus der Repo-Wurzel und aus `doc/` fehlerfrei, E7-Vorschau und
+    Mock-Schleife mit S3-Volltext, geschützte Dateien unverändert. Kein Request an `llm.thalabus.ai`.
+  - **Offen:** Das Löschen von `results/show_one_run.txt` ist weiterhin nicht committet (nicht Teil dieses Schritts).
+  - **Nächster Schritt:** Freigabe des Laufs E7 durch Roland.
 
 ## 14. Quellen
 

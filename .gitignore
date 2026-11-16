@@ -5,3 +5,4 @@ __pycache__/
 .vscode/
 .DS_Store
 results/selftest.jsonl
+results/show_one_run.json
