@@ -44,6 +44,7 @@ Luca Strozzi): streamed tool-call interception ("Instant RAG") using arithmetic 
 - Propose a commit message; commit only after approval.
 - Commit message format (Roland's standard): compact and structured. One imperative subject line
   (max. ~60 chars), blank line, 2–5 short bullets (`- area: what changed`). No long prose.
+  Never add a `Co-Authored-By: Claude …` trailer or any other Claude attribution to commit messages or PRs.
 - Scientific or design questions: add them to plan §3 and ask. Roland decides; the scientific
   discussion happens in his Claude Desktop project.
 
