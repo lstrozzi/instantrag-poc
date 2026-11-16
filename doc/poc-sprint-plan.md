@@ -76,6 +76,7 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | O12a | Endantwort-Regel (Notebook 6.2 `final_value`: Zahl nach dem letzten „=“): `13 + (6 * 7) = 55, because 6 * 7 = 42` ergibt Endwert 42 und C-FINAL, obwohl die Antwort stimmt (Review 15.11., offline belegt). | C-FINAL nur, wenn der Sollwert nirgends als ganze Zahl steht oder eine andere Zahl als Ergebnis behauptet wird; solche Fälle in die Handprüfung | offen – noch nicht umgesetzt |
 | O12b | A-MALF bei zitierter Tag-Syntax: Thinking mit `<ADD x1="..." x2="..." [...] xn="..."/>` (Zitat aus dem Systemprompt) und danach korrektem, ausgeführtem Call ergibt A-MALF und Stufe ✗; ein Rückblick auf den Call im Thinking der Endantwort ergibt A-WRONG (Review 15.11., offline belegt). | A-MALF nur als Fehler, wenn in der Stage kein gültiger Call ausgeführt wurde, sonst beschreibend; für den Rückblick in der Endantwort analog entscheiden | offen – noch nicht umgesetzt |
 | O12c | B-PREM erkennt nur den richtigen Sollwert: eine vorzeitige falsche Zahl („The result is 61.“) und `42.0` bleiben unerkannt; `<MUL x1="6" x2="7" result="42"/>` gilt als strict (nur B-SELF). H3 kann so 0 Fälle melden (Review 15.11., offline belegt). | B-PREM für jede Zahl im Antwortkanal einer Nicht-End-Stage, die weder aus der Frage noch aus RESULTS stammt; Zahl in einem Zusatzattribut als B-FORGE | offen – noch nicht umgesetzt |
+| O12d | Thinking-Text im Antwortkanal: Bei E1b T1-04 und T1-07 steht im `content` erst Thinking-Text, dann `</think>`, dann nur die Hold-Message. `final_value` liest daraus 48 bzw. 2 als Endantwort und vergibt C-FINAL; tatsächlich gab es keine Endantwort (Export 16.11., echte Daten). | Für Endantwort, B-PREM und A-LEAK nur den Text nach dem letzten `</think>` als Antwort werten, den Teil davor als Thinking; zusätzlich beschreibend markieren. Der Export 6.10 nutzt diese Regel bereits für die Hold-Erkennung | offen – noch nicht umgesetzt |
 
 ## 4. Befundlage (Analyse 2026-11-14)
 
@@ -513,6 +514,40 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
   - **Offen:** O12a–c; V0; M1-Erreichbarkeit (E1/E2); Docstring von `show_runs.py` nennt `run_view.html`, das Skript
     schreibt `runs_view.html`.
   - **Nächster Schritt:** Auswertung E1b → E4 im Projekt-Chat, dann O12a–c.
+- **2026-11-16 12:03 · Claude Code · Ergebnis-Export (Notebook 6.10) und `show_runs.py`, Review durch Roland ausstehend:**
+  - **Auftrag:** Export aus dem Meeting mit Luca (16.11.), freigegeben mit D1–D4 und der Spalte `grund`.
+  - **Klarstellung:** Das Feld `error` in den Rohdaten bezeichnet nur Infrastrukturfehler. Modellversagen steht nicht
+    dort, sondern in der Export-Spalte `ergebnis`.
+  - **Geändert:** `proof-of-concept.ipynb`: 2 neue Zellen 6.10 nach 6.9, sonst unverändert (Diff nur Einfügungen).
+    `evaluate_run` liefert die Bewertung, daraus entstehen `ergebnis` (`ok` | `ok_nach_korrektur` | `abbruch_dep` |
+    `haengt_hold_message` | `keine_antwort` | `falsche_antwort` | `protokollfehler` | `infra_fehler`; D1 ergänzt die
+    beiden Kategorien `keine_antwort` und `protokollfehler`), `fehlgeschlagen_in_stage` und `grund` (automatischer Satz). Die Hold-Prüfung
+    liest nur den Text nach dem letzten `</think>` (D2). Ein `[halt]` wegen Platzhalter zählt nicht als `abbruch_dep`, weil der
+    Harness dafür dieselbe Meldung ausgibt. Der Export schreibt `results/run_summary.csv`, `failed_runs.csv` (+ `auszug`)
+    und `run_stats.csv` (Raten über den ersten gültigen Lauf je Aufgabe, Wilson-KI), im Format UTF-8 mit BOM und
+    deterministisch (D3), und zeigt alle drei als Tabelle. `results/show_runs.py`: `run_id` und `item_id` kommen dazu,
+    die Ausgabe ist chronologisch, `ergebnis` und `grund` werden aus `run_summary.csv` gelesen (D4) und ersetzen die alte
+    Schnellprüfung „ok“. Neu ist `--failed` (bei HTML → `runs_failed_view.html`). Der Docstring nennt jetzt
+    `runs_view.html`. Bei umgeleiteter Ausgabe stürzt das Skript nicht mehr ab. `runs_view.html` ist neu erzeugt.
+    Plan §3: O12d.
+  - **Ergebnis auf den echten Daten (vorläufig, O12a–d offen):** E4 (S1): ok 0 · ok_nach_korrektur 5 · abbruch_dep 4 ·
+    keine_antwort 1 → ok 0/10 [0,00; 0,28], inkl. Korrektur 5/10 [0,24; 0,76]. E1b (S0): ok 1 · ok_nach_korrektur 3 ·
+    abbruch_dep 3 · haengt_hold_message 3 → ok 1/10 [0,02; 0,40], inkl. Korrektur 4/10 [0,17; 0,69]. Kein I-ERR.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt):** ganzes Notebook (31 Code-Zellen) aus der
+    Repo-Wurzel und aus `doc/` fehlerfrei. Die Kategorie-Verteilung oben ist als Assert geprüft, außerdem 5 `grund`-Sätze
+    wörtlich, die chronologische Reihenfolge, 19 Nicht-ok-Läufe mit Auszug ≤ 300 Zeichen und KI-Werte. Ein zweiter
+    Export war bytegleich, ein Export ohne Läufe läuft ohne Fehler. Die 22 synthetischen Szenarien aus 6.7 sind
+    plausibel eingeordnet (I-ERR-Fälle → `infra_fehler`, Platzhalter → `falsche_antwort`, `<DEP>` zu früh →
+    `abbruch_dep`, Leak → `ok`). SHA-256 von `runs.jsonl` und `playground.jsonl` vorher und nachher gleich. API-Key
+    in keiner geänderten oder erzeugten Datei. `show_runs.py`: Übersicht, `--failed` (19 von 20), Detail,
+    `--file playground.jsonl` (4 Läufe, „–“, da nicht im Export), `--html`, `--html --failed`, Sortierung bei
+    umgekehrter Eingabe (Nr. bleibt der Dateiindex). Kein Request an `llm.thalabus.ai`, kein Commit.
+  - **Nicht getestet:** die Darstellung der Tabellen im Jupyter-Kernel in VS Code, das Öffnen der CSVs in Excel.
+  - **Nebenbefunde:** `results/selftest.jsonl` fehlte vor den Tests und wurde durch den Notebook-Selbsttest neu
+    angelegt (3 Zeilen, lokal, in `.gitignore`). Der Arbeitsbaum enthält Änderungen, die nicht von mir stammen:
+    `playground.jsonl` mit +1 Zeile, `show_one_run.txt` gelöscht, `show_one_run.json` neu.
+  - **Offen:** O12a–d. Playground-Läufe sind nicht im Export.
+  - **Nächster Schritt:** Review des Exports durch Roland/Luca, dann O12a–d.
 
 ## 14. Quellen
 
