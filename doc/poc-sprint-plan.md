@@ -57,6 +57,7 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | 2026-11-16 | Seed fest je Aufgabe und in allen Experimenten gleich (T1-01 → 101 … T2-10 → 210). | Gepaarte Läufe unterscheiden sich nur im untersuchten Faktor; jeder Request-Body bleibt eindeutig (Prompt, Modell oder Aufgabe verschieden). |
 | 2026-11-16 | V0 läuft nicht vor den ersten Experimenten. | Zeitgründe (Meeting 16.11.). Ein Body-basierter Cache kann keine alten Antworten liefern, weil kein Request-Body doppelt vorkommt; V0 (c) betrifft nur die Deutung und wird nachgeholt. |
 | 2026-11-16 12:12 | Neue Prompt-Version S3 (Basis S2) als bewusst gebündeltes Paket (Ziel: Erfolgsrate): Regel 3 = Reihenfolge-Regel (ersetzt die S2-Erstschritt-Regel), Regel 4 (Kanalregel) bleibt, neue Regel 5 = Abschlussregel, Beispiele „Server:“ → „System:“ (Lucas Vorgabe). Neues Experiment E7 = S3 · M2 · T1 · Phase −3, gleiche Seeds; Vergleiche E4 → E7 und E1b → E7. Die bisher für O9 reservierte ID E7 heißt jetzt E8. | Anlass: Fehlerbilder aus E1b/E4 (`abbruch_dep`, Hold-Message trotz vollständiger RESULTS). Eine Wirkung lässt sich keiner Einzeländerung zuordnen. Die Reihenfolge-Regel ist so formuliert, dass sie Beispiel A nicht widerspricht. S1/S2 bleiben unverändert. Lauf nur nach Rolands Freigabe. |
+| 2026-11-16 21:03 | **Entwicklungsprotokoll S3.x:** T1 ist das Entwicklungsset. Ausgangspunkt ist E7 (S3); jede Iteration ist eine Unterversion S3.N mit eigener Datei und eigenem Experiment E7.N auf T1 mit den Seeds 101–110. Abbruch, sobald eine Iteration ≥ 8/10 funktional erreicht, spätestens nach 4 Iterationen (S3.1–S3.4). Danach wird die Version eingefroren und einmalig validiert: auf T2 (Seeds 201–210) und einer neuen Testsuite (Seeds ab 211). Erste Iteration: S3.1 (Begriff „system“, Satz zur RESULTS-Rolle, Hervorhebung der Regeln, Beispiel D), Experiment E7.1, Vergleich E7 → E7.1. Die lokale Änderung an `instantrag_s3.txt` ist in S3.1 aufgegangen; S3 steht wieder auf dem Stand, mit dem E7 lief (`25b1074a…`). | T1-Raten nach mehreren Iterationen sind durch die Auswahl der besten Version nach oben verzerrt; aussagekräftig ist erst die Validierung auf T2 und der neuen Suite (§3, O13). Die Suite-Seeds beginnen bei 211, weil T2 fest 201–210 belegt. 8/10 entspricht der Schwelle von H1. Lauf nur nach Rolands Freigabe. |
 | 2026-11-16 00:25 | O4: Repo ist privat (nur Roland und Luca) → `results/runs.jsonl` und `results/playground.jsonl` werden committet; `results/selftest.jsonl` bleibt lokal (`.gitignore`). | Rohdaten der Experimente gehören zum Reproduzierbarkeitspaket; Selbsttest-Zeilen entstehen bei jedem „Run All“ und sind keine Daten. |
 
 ## 3. Offene Entscheidungen (vor der Umsetzung klären)
@@ -78,6 +79,7 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | O12b | A-MALF bei zitierter Tag-Syntax: Thinking mit `<ADD x1="..." x2="..." [...] xn="..."/>` (Zitat aus dem Systemprompt) und danach korrektem, ausgeführtem Call ergibt A-MALF und Stufe ✗; ein Rückblick auf den Call im Thinking der Endantwort ergibt A-WRONG (Review 15.11., offline belegt). | A-MALF nur als Fehler, wenn in der Stage kein gültiger Call ausgeführt wurde, sonst beschreibend; für den Rückblick in der Endantwort analog entscheiden | offen – noch nicht umgesetzt |
 | O12c | B-PREM erkennt nur den richtigen Sollwert: eine vorzeitige falsche Zahl („The result is 61.“) und `42.0` bleiben unerkannt; `<MUL x1="6" x2="7" result="42"/>` gilt als strict (nur B-SELF). H3 kann so 0 Fälle melden (Review 15.11., offline belegt). | B-PREM für jede Zahl im Antwortkanal einer Nicht-End-Stage, die weder aus der Frage noch aus RESULTS stammt; Zahl in einem Zusatzattribut als B-FORGE | offen – noch nicht umgesetzt |
 | O12d | Thinking-Text im Antwortkanal: Bei E1b T1-04 und T1-07 steht im `content` erst Thinking-Text, dann `</think>`, dann nur die Hold-Message. `final_value` liest daraus 48 bzw. 2 als Endantwort und vergibt C-FINAL; tatsächlich gab es keine Endantwort (Export 16.11., echte Daten). | Für Endantwort, B-PREM und A-LEAK nur den Text nach dem letzten `</think>` als Antwort werten, den Teil davor als Thinking; zusätzlich beschreibend markieren. Der Export 6.10 nutzt diese Regel bereits für die Hold-Erkennung | offen – noch nicht umgesetzt |
+| O13 | Auswahleffekt im Entwicklungsprotokoll S3.x: Bis zu 4 Iterationen auf denselben 10 T1-Aufgaben (gleiche Seeds) heben die T1-Rate der gewählten Version systematisch an; bei n = 10 und T = 0,1 kann auch Zufall eine Iteration über 8/10 bringen. | T1-Raten der S3.x-Iterationen nur als Entwicklungsdaten berichten; Aussagen zur Wirkung nur aus der einmaligen Validierung (T2 + neue Suite) der eingefrorenen Version; Anzahl der Iterationen in der Thesis nennen | offen |
 
 ## 4. Befundlage (Analyse 2026-11-14)
 
@@ -165,7 +167,9 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
   raus, Regel 2: Zahlen aus Frage oder `<RESULTS>`, Beispiel B korrigiert, RESULTS rollenneutral als „Server“, Ausführender „server“ statt „user“), sonst
   wortgleich · **S2** S1 + Erstschritt-Regel + Kanalregel (zwei Änderungen gebündelt → bei Wirkung Einzeltest) ·
   **S3** (16.11.) S2 mit Reihenfolge-Regel statt Erstschritt-Regel + Abschlussregel + Beispiele „System:“; bewusst
-  gebündeltes Paket mit dem Ziel Erfolgsrate (Details `doc/prompt-versions.md`).
+  gebündeltes Paket mit dem Ziel Erfolgsrate (Details `doc/prompt-versions.md`) · **S3.x** Iterationen von S3 nach
+  dem Entwicklungsprotokoll (§2, 16.11. 21:03): **S3.1** „system“ statt „server“, Satz zur RESULTS-Rolle,
+  Hervorhebung der Regeln, Beispiel D in T1-Form.
 - **M1** `qwen-3.5-35b` · **M2** `qwen-3.8-180b-next` · M3 kleineres Modell, falls verfügbar.
 - **T1** 10 Aufgaben a+(b·c) inkl. Referenz `10+(2*4)` (z. B. 13+(6*7), 21+(4*9)) · **T2** 10 Aufgaben a·(b+c)
   (z. B. 7*(4+9), 4*(9+8)). Regeln: ganze Zahlen; keine 0 oder 1 als Operand; Zwischen- und Endergebnis
@@ -182,6 +186,7 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
 | E5 | bis Mi | Aufgabentyp T1→T2 | S1 | M1 | T2 | 10 | E2 |
 | E6 | optional bis Fr | Server liefert falsche Werte (Eingriff von außen) | S1 | M1 | T1 | 10 | E2 |
 | E7 | ab 16.11., nach Freigabe | Prompt-Paket S3 (16.11.) | S3 | M2 | T1 | 10 | E4 (S1 → S3), E1b (S0 → S3), gleiche Aufgaben und Seeds |
+| E7.1 | ab 16.11., nach Freigabe | S3-Iteration 1: S3.1 (Entwicklungsprotokoll §2) | S3.1 | M2 | T1 | 10 | E7 (S3 → S3.1), gleiche Aufgaben und Seeds |
 | E8 | nach Klärung mit Luca | RESULTS im System-Inhalt an Position 0 (O9) | – | – | T1 | 10 | offen |
 
 **V0 im Detail:** (a) `/v1/models` abfragen; (b) Cache: Referenz-Request zweimal identisch, dann mit anderem
@@ -660,6 +665,28 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
   - **Nicht getestet:** echter Suite-Lauf (braucht Rolands Freigabe); Darstellung im Jupyter-Kernel in VS Code.
   - **Nächster Schritt:** Review; Commit A und B nach Freigabe. Die Dateien von A liegen bereits im Git-Index
     (nur `git add`), damit sich A und B getrennt committen lassen.
+- **2026-11-16 21:03 · Claude Code · Prompt S3.1 und Experiment E7.1 (Entwicklungsprotokoll S3.x):**
+  - **Entscheidungen Roland (§2):** Entwicklungsprotokoll S3.x. D1: S3 wird auf den Stand von E7 zurückgesetzt.
+    D2: Die neue Validierungs-Suite beginnt bei Seed 211.
+  - **Geändert:**
+    - `config/instantrag_s3.txt` per `git checkout` auf `25b1074a…` zurückgesetzt. Die lokale Fassung von 20:21 ist
+      vollständig in S3.1 enthalten.
+    - `config/instantrag_s3_1.txt` neu, Rolands Text wörtlich (CRLF, kein Zeilenumbruch am Ende), Hash
+      `4df43ccc0e2fb9cd`.
+    - `doc/prompt-versions.md`: Versionsschema S3.x, Zeile und Abschnitt S3.1 mit Änderungstabelle.
+    - Notebook, 5 Zellen gezielt: `PROMPT_PATHS` + S3.1, Volltext, Register + E7.1 (S3.1 · M2 · T1), Vergleich
+      E7 → E7.1.
+    - Plan: §2 (Protokoll), §3 (O13 Auswahleffekt), §7 (S3.x, Zeile E7.1).
+  - **Diff S3 → S3.1 (per Skript geprüft, keine weiteren Unterschiede):** 6 Zeilen entfernt, 15 hinzugefügt:
+    „server“ → „system“ (6×), Satz zur RESULTS-Rolle, „**Protocol rules:**“ und „NEVER DISMISS …“, Beispiel D.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt):**
+    - Ganzes Notebook aus der Repo-Wurzel und aus `doc/` fehlerfrei; 1.4 zeigt S3.1 mit Datei-Hash.
+    - `experiment_plan(["E7.1"])`: 10 offene Aufgaben, S3.1, M2, Seeds 101–110 gleich E7. E7 ist vollständig.
+    - Mock-Schleife: 10 Läufe, 30 Requests, jeder Request-Body mit S3.1-Volltext und M2.
+    - Mit den Mock-Daten: Vergleich E7 → E7.1 mit 10 Paaren, Matrix-Spalte E7.1 im Export.
+    - Hashes S0–S3.1 wie dokumentiert; Rohdaten und Lucas Dateien unverändert. Kein Request.
+  - **Offen:** O12a–d, O13. Das Löschen von `results/show_one_run.txt` ist weiterhin nicht committet.
+  - **Nächster Schritt:** Roland gibt E7.1 frei → `EXPERIMENTE = ["E7.1"]`, `RUN_EXPERIMENTE = True`, danach Export 6.10.
 
 ## 14. Quellen
 
