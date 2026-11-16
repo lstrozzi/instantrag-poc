@@ -618,6 +618,48 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
     - Rohdaten, `poc_items.json`, S0–S3 und Lucas Dateien unverändert (SHA-256). Kein Request.
   - **Nicht getestet:** Öffnen der CSVs in Excel; Darstellung der Matrix im Jupyter-Kernel in VS Code.
   - **Nächster Schritt:** Schritt B (Testsuites), dann Commit von A und B getrennt nach Freigabe.
+- **2026-11-16 19:17 · Claude Code · Schritt B: Testsuites, Review durch Roland ausstehend:**
+  - **Geändert:**
+    - `testsuites/beispiel.txt` neu: S3, `qwen-3.8-180b-next`, Seed ab 301, 5 Fragen.
+    - Notebook:
+      - Neue Zellen 5.4 (Format, Parser, `load_suite`, `suite_plan`, `run_suite`) und 5.5 (`SUITE = "beispiel.txt"`,
+        `RUN_SUITE = False`, Vorschau).
+      - 1.6 `run_logged`: optionales Argument `extra` für zusätzliche Felder. Es darf keine Standardfelder ersetzen;
+        das Schema bleibt additiv, `schema_version` 1.
+      - 6.2 `find_item`: Suite-Läufe (`experiment = "suite:<datei>"`) leiten die Aufgabe aus der Frage ab und prüfen
+        sie gegen den gespeicherten Sollwert.
+      - 5 (Einleitung): Hinweis auf die Testsuites.
+    - `results/show_runs.py`: Spaltenbreiten passen sich an `suite:…` und `beispiel-L01` an.
+    - Unverändert: E1–E7, `config/poc_items.json`, `ITEMS`.
+  - **Regeln:**
+    - Kopfzeilen `# model:` (voller Name oder M1/M2), `# prompt:` und `# seed:` stehen vor der ersten Frage. Leere
+      Zeilen und andere `#`-Zeilen werden übersprungen. Fragen werden wörtlich gesendet.
+    - Der Ausdruck ab der ersten Ziffer bzw. Klammer muss genau `a op (b op c)` sein; sonst wird die Zeile mit
+      Zeilennummer und Grund abgelehnt.
+    - Seed = Start + Frage-Index (ab 0). Aufgaben-Id `<name>-L01` …; `suite_line` = Zeile in der Datei, dazu
+      `suite_sha256`.
+    - Eine Frage mit gültigem Lauf und gleichem Text wird übersprungen. Bei einer anderen Prüfsumme als bei früheren
+      Läufen gibt es eine Warnung mit den geänderten Aufgaben.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt):**
+    - Ganzes Notebook aus der Repo-Wurzel und aus `doc/` fehlerfrei; die Vorschau zeigt 5 offene Fragen und sendet
+      nichts.
+    - Parser: 3 gültige Formen und 10 Ablehnungen mit dem erwarteten Grund (`-`, `/`, `x`, Dezimalzahl, keine,
+      doppelte oder vorangestellte Klammer, Zusatzterm, drei Operanden, kein Ausdruck).
+    - `load_suite`: Sollwerte, Calls, Seeds 301–305 und Zeilen 6–10 korrekt; 7 Fehlerfälle (Kopfzeile fehlt, unbekannter
+      Prompt bzw. unbekanntes Modell, ungültige Zeile, Kopfzeile nach Frage, Seed keine Zahl, keine Frage); Alias M2.
+    - Mock-Schleife in eine temporäre Datei: 5 Läufe, 15 Requests; Request-Body mit S3-Volltext, M2, Seed und Frage;
+      Datensatz mit `suite_line` und `suite_sha256`. Ein zweiter Durchlauf sendet nichts. Nach einer geänderten Zeile
+      kommt die Warnung, und genau diese Zeile ist wieder offen.
+    - Positivfall: Suite-Zeile `10+(2*4)` mit dem A.1-Replay ergibt ok (strict). Ein manipulierter Sollwert im Datensatz
+      ist „nicht bewertbar“.
+    - Export mit Suite-Läufen: Matrix-Spalte `suite:beispiel.txt`, 5 zusätzliche Zeilen, Statistikzeile. `show_runs.py`
+      zeigt Suite-Zeilen in Übersicht und HTML.
+    - `run_logged` weist ein `extra`-Feld zurück, das ein Standardfeld ersetzen würde, ohne etwas zu schreiben.
+    - Export-Tests aus Schritt A weiterhin grün.
+    - Rohdaten, `poc_items.json`, S0–S3, `beispiel.txt` und Lucas Dateien unverändert (SHA-256). Kein Request.
+  - **Nicht getestet:** echter Suite-Lauf (braucht Rolands Freigabe); Darstellung im Jupyter-Kernel in VS Code.
+  - **Nächster Schritt:** Review; Commit A und B nach Freigabe. Die Dateien von A liegen bereits im Git-Index
+    (nur `git add`), damit sich A und B getrennt committen lassen.
 
 ## 14. Quellen
 

@@ -1,0 +1,10 @@
+# Beispiel-Testsuite (Notebook 5.4). Kopfzeilen vor der ersten Frage, dann eine Frage pro Zeile.
+# Erlaubt ist nur die Form a op (b op c) mit Ganzzahlen und + bzw. *; Seed der Frage i = Start + i (i ab 0).
+# model: qwen-3.8-180b-next
+# prompt: S3
+# seed: 301
+Please calculate 12+(3*7)
+Please calculate 6*(5+8)
+Please calculate 23+(4*6)
+Please calculate 3*(14+9)
+Please calculate 11+(7*8)

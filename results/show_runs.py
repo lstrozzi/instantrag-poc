@@ -99,7 +99,10 @@ def chronological(records, failed=False):
 
 
 def overview(records, failed=False):
-    head = (f"{'Nr':>3}  {'run_id':22} {'Exp':5} {'Prompt':6} {'Item':6} {'Seed':>4}  {'Frage':26} {'St':>2} "
+    # widths grow for test suites ("suite:<file>", item ids like "beispiel-L01")
+    wx = max([5] + [len(str(r.get("experiment") or "")) for r in records])
+    wi = max([6] + [len(summary(r)["item_id"]) for r in records])
+    head = (f"{'Nr':>3}  {'run_id':22} {'Exp':{wx}} {'Prompt':6} {'Item':{wi}} {'Seed':>4}  {'Frage':26} {'St':>2} "
             f"{'Korr':4} {'Leak':4} {'Halt':4} {'Antwort':>7} {'Soll':>5}  ergebnis")
     print(head)
     print("-" * len(head))
@@ -108,8 +111,8 @@ def overview(records, failed=False):
         s = summary(r)
         q = r["question"].replace("Please calculate ", "")
         yn = lambda b: "ja" if b else "–"
-        print(f"{i:>3}  {r.get('run_id',''):22} {r.get('experiment',''):5} {r.get('prompt_version',''):6} "
-              f"{s['item_id']:6} {str(r.get('seed','')):>4}  "
+        print(f"{i:>3}  {r.get('run_id',''):22} {r.get('experiment',''):{wx}} {r.get('prompt_version',''):6} "
+              f"{s['item_id']:{wi}} {str(r.get('seed','')):>4}  "
               f"{q:26} {s['stages']:>2} {yn(s['korrektur']):4} {yn(s['leak']):4} {yn(s['halt']):4} "
               f"{str(s['antwort'] if s['antwort'] is not None else '–'):>7} {str(s['soll'] if s['soll'] is not None else '–'):>5}  {s['ergebnis']}")
         print(f"{'':5}↳ {s['grund']}")
