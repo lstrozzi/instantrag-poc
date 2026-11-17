@@ -2,7 +2,8 @@
 .venv
 *.pyc
 __pycache__/
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .DS_Store
 results/selftest.jsonl
 results/show_one_run.json

@@ -1,0 +1,17 @@
+# Validierungs-Suite val_t1_new: T1-Form a+(b*c) mit neuen Zahlen.
+# ZURUECKGEHALTEN: erst nach Festlegung der finalen S3.x-Version laufen lassen (Notebook 5.4: HELD_SUITES).
+# Erzeugt mit testsuites/make_validation_suites.py, Startwert 20261117; Regeln: doc/poc-sprint-plan.md §2.
+# Die Prompt-Kopfzeile ist ein Platzhalter (S3.1); vor dem Lauf auf die finale S3.x setzen.
+# model: qwen-3.8-180b-next
+# prompt: S3.1
+# seed: 211
+Please calculate 37+(4*7)
+Please calculate 17+(7*8)
+Please calculate 11+(12*8)
+Please calculate 19+(11*12)
+Please calculate 31+(9*12)
+Please calculate 13+(9*4)
+Please calculate 28+(11*9)
+Please calculate 33+(8*9)
+Please calculate 28+(12*4)
+Please calculate 31+(8*11)

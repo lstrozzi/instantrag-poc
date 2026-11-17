@@ -1,0 +1,11 @@
+{
+    "python.terminal.useEnvFile": true,
+    "csv.defaultSeparator": ";",
+    "files.associations": {
+        "*.csv": "csv (semicolon)"
+    },
+    "csv-preview.separator": ";",
+    "workbench.editorAssociations": {
+        "*.csv": "gc-excelviewer-csv-editor"
+    }
+}

@@ -58,6 +58,8 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | 2026-11-16 | V0 läuft nicht vor den ersten Experimenten. | Zeitgründe (Meeting 16.11.). Ein Body-basierter Cache kann keine alten Antworten liefern, weil kein Request-Body doppelt vorkommt; V0 (c) betrifft nur die Deutung und wird nachgeholt. |
 | 2026-11-16 12:12 | Neue Prompt-Version S3 (Basis S2) als bewusst gebündeltes Paket (Ziel: Erfolgsrate): Regel 3 = Reihenfolge-Regel (ersetzt die S2-Erstschritt-Regel), Regel 4 (Kanalregel) bleibt, neue Regel 5 = Abschlussregel, Beispiele „Server:“ → „System:“ (Lucas Vorgabe). Neues Experiment E7 = S3 · M2 · T1 · Phase −3, gleiche Seeds; Vergleiche E4 → E7 und E1b → E7. Die bisher für O9 reservierte ID E7 heißt jetzt E8. | Anlass: Fehlerbilder aus E1b/E4 (`abbruch_dep`, Hold-Message trotz vollständiger RESULTS). Eine Wirkung lässt sich keiner Einzeländerung zuordnen. Die Reihenfolge-Regel ist so formuliert, dass sie Beispiel A nicht widerspricht. S1/S2 bleiben unverändert. Lauf nur nach Rolands Freigabe. |
 | 2026-11-16 21:03 | **Entwicklungsprotokoll S3.x:** T1 ist das Entwicklungsset. Ausgangspunkt ist E7 (S3); jede Iteration ist eine Unterversion S3.N mit eigener Datei und eigenem Experiment E7.N auf T1 mit den Seeds 101–110. Abbruch, sobald eine Iteration ≥ 8/10 funktional erreicht, spätestens nach 4 Iterationen (S3.1–S3.4). Danach wird die Version eingefroren und einmalig validiert: auf T2 (Seeds 201–210) und einer neuen Testsuite (Seeds ab 211). Erste Iteration: S3.1 (Begriff „system“, Satz zur RESULTS-Rolle, Hervorhebung der Regeln, Beispiel D), Experiment E7.1, Vergleich E7 → E7.1. Die lokale Änderung an `instantrag_s3.txt` ist in S3.1 aufgegangen; S3 steht wieder auf dem Stand, mit dem E7 lief (`25b1074a…`). | T1-Raten nach mehreren Iterationen sind durch die Auswahl der besten Version nach oben verzerrt; aussagekräftig ist erst die Validierung auf T2 und der neuen Suite (§3, O13). Die Suite-Seeds beginnen bei 211, weil T2 fest 201–210 belegt. 8/10 entspricht der Schwelle von H1. Lauf nur nach Rolands Freigabe. |
+| 2026-11-17 01:29 | **E7.1 (S3.1) erreicht das Abbruchkriterium nicht:** 4/10 funktional, 9/10 inkl. Korrektur. S3.2 wird zurückgestellt bis zur Entscheidung mit Luca (17.11., 10 Uhr) zur Fortsetzungsmechanik. | Der Engpass liegt vermutlich im Harness, nicht im Prompt (Einschätzung Roland, Läufe Nr. 30 und 34). Datenstand für das Meeting: Tag `meeting-17-11` (Commit `51da4b5`). |
+| 2026-11-17 01:29 | **Validierungs-Suites vorbereitet und zurückgehalten:** `testsuites/val_t1_new.txt` (10 × a+(b·c), Seeds 211–220) und `testsuites/val_forms.txt` ((b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230), beide M2. Erzeugt mit `testsuites/make_validation_suites.py`, **Startwert `20261117`**; `python testsuites/make_validation_suites.py` schreibt fehlende Dateien und prüft vorhandene. Regeln: wie `config/poc_items.json` (Ganzzahlen, keine 0/1, Zwischen- und Endergebnis mehrstellig und verschieden, alle Ergebnisse einer Suite verschieden), dazu paarweise verschiedene Operanden, keine Zahl aus den S3.1-Beispielen {2, 3, 5, 6, 15, 18, 23} als Operand oder Ergebnis, kein Operanden-Tripel aus T1/T2 oder der anderen Suite. **Prompt-Kopfzeile S3.1 ist ein Platzhalter**, weil das Suite-Format eine registrierte Version verlangt: vor dem Validierungslauf auf die finale S3.x setzen. `HELD_SUITES` (Notebook 5.4) sperrt das Senden. Der Suite-Parser akzeptiert zusätzlich `(b op c) op a` (Freigabe Roland); die Bewertung bleibt unverändert. | Validierung nach dem Entwicklungsprotokoll (16.11. 21:03): neue Zahlen in T1-Form und andere Formen. Faktoren 4, 7, 8, 9, 11, 12, weil einstellige Faktoren ohne 6 keine 10 verschiedenen Produkte ergeben. Bringt eine spätere S3.x neue Beispiele, sind deren Zahlen vor dem Lauf gegen die Suites zu prüfen. |
 | 2026-11-16 00:25 | O4: Repo ist privat (nur Roland und Luca) → `results/runs.jsonl` und `results/playground.jsonl` werden committet; `results/selftest.jsonl` bleibt lokal (`.gitignore`). | Rohdaten der Experimente gehören zum Reproduzierbarkeitspaket; Selbsttest-Zeilen entstehen bei jedem „Run All“ und sind keine Daten. |
 
 ## 3. Offene Entscheidungen (vor der Umsetzung klären)
@@ -80,6 +82,7 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | O12c | B-PREM erkennt nur den richtigen Sollwert: eine vorzeitige falsche Zahl („The result is 61.“) und `42.0` bleiben unerkannt; `<MUL x1="6" x2="7" result="42"/>` gilt als strict (nur B-SELF). H3 kann so 0 Fälle melden (Review 15.11., offline belegt). | B-PREM für jede Zahl im Antwortkanal einer Nicht-End-Stage, die weder aus der Frage noch aus RESULTS stammt; Zahl in einem Zusatzattribut als B-FORGE | offen – noch nicht umgesetzt |
 | O12d | Thinking-Text im Antwortkanal: Bei E1b T1-04 und T1-07 steht im `content` erst Thinking-Text, dann `</think>`, dann nur die Hold-Message. `final_value` liest daraus 48 bzw. 2 als Endantwort und vergibt C-FINAL; tatsächlich gab es keine Endantwort (Export 16.11., echte Daten). | Für Endantwort, B-PREM und A-LEAK nur den Text nach dem letzten `</think>` als Antwort werten, den Teil davor als Thinking; zusätzlich beschreibend markieren. Der Export 6.10 nutzt diese Regel bereits für die Hold-Erkennung | offen – noch nicht umgesetzt |
 | O13 | Auswahleffekt im Entwicklungsprotokoll S3.x: Bis zu 4 Iterationen auf denselben 10 T1-Aufgaben (gleiche Seeds) heben die T1-Rate der gewählten Version systematisch an; bei n = 10 und T = 0,1 kann auch Zufall eine Iteration über 8/10 bringen. | T1-Raten der S3.x-Iterationen nur als Entwicklungsdaten berichten; Aussagen zur Wirkung nur aus der einmaligen Validierung (T2 + neue Suite) der eingefrorenen Version; Anzahl der Iterationen in der Thesis nennen | offen |
+| O14 | Gleichartige Operationen in `val_forms` (`a*(b*c)`, `a+(b+c)`): Eine mathematisch gleichwertige andere Reihenfolge (für `4*(12*8)` erst `4*12`, dann `48*8`) ergibt A-WRONG in beiden Stages und bei richtiger Endantwort die Kategorie `protokollfehler` (offline belegt, 17.11.). | So lassen (Protokollregel „innerste zuerst“), in der Auswertung der Validierung aber getrennt ausweisen | offen |
 
 ## 4. Befundlage (Analyse 2026-11-14)
 
@@ -187,6 +190,8 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
 | E6 | optional bis Fr | Server liefert falsche Werte (Eingriff von außen) | S1 | M1 | T1 | 10 | E2 |
 | E7 | ab 16.11., nach Freigabe | Prompt-Paket S3 (16.11.) | S3 | M2 | T1 | 10 | E4 (S1 → S3), E1b (S0 → S3), gleiche Aufgaben und Seeds |
 | E7.1 | ab 16.11., nach Freigabe | S3-Iteration 1: S3.1 (Entwicklungsprotokoll §2) | S3.1 | M2 | T1 | 10 | E7 (S3 → S3.1), gleiche Aufgaben und Seeds |
+| suite:val_t1_new.txt | nach Einfrieren der finalen S3.x (zurückgehalten) | Validierung: T1-Form, neue Zahlen | finale S3.x (Kopfzeile derzeit S3.1) | M2 | a+(b·c), Seeds 211–220 | 10 | finale E7.N auf T1 |
+| suite:val_forms.txt | nach Einfrieren der finalen S3.x (zurückgehalten) | Validierung: andere Formen | finale S3.x (Kopfzeile derzeit S3.1) | M2 | (b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230 | 10 | – |
 | E8 | nach Klärung mit Luca | RESULTS im System-Inhalt an Position 0 (O9) | – | – | T1 | 10 | offen |
 
 **V0 im Detail:** (a) `/v1/models` abfragen; (b) Cache: Referenz-Request zweimal identisch, dann mit anderem
@@ -687,6 +692,55 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
     - Hashes S0–S3.1 wie dokumentiert; Rohdaten und Lucas Dateien unverändert. Kein Request.
   - **Offen:** O12a–d, O13. Das Löschen von `results/show_one_run.txt` ist weiterhin nicht committet.
   - **Nächster Schritt:** Roland gibt E7.1 frei → `EXPERIMENTE = ["E7.1"]`, `RUN_EXPERIMENTE = True`, danach Export 6.10.
+- **2026-11-17 01:29 · Claude Code · E7.1-Daten, Validierungs-Suites, Übersicht 5.0:**
+  - **E7.1 (Lauf Roland, 16.11.):** 10 Läufe in `results/runs.jsonl`, nur angehängt (+10, −0), keine I-ERR. Ergebnis:
+    ok 4 · ok_nach_korrektur 5 · haengt_hold_message 1.
+    - **Abbruchkriterium nicht erreicht:** 4/10 funktional, 9/10 inkl. Korrektur.
+    - **S3.2 zurückgestellt** bis zur Entscheidung mit Luca (17.11., 10 Uhr) zur Fortsetzungsmechanik, da der Engpass
+      vermutlich im Harness liegt (Läufe Nr. 30 und 34; Einschätzung Roland).
+    - **Commit 1:** `51da4b5` „Add E7.1 runs and export“ mit `runs.jsonl`, den Export-CSVs (Rolands Export) und den
+      neu erzeugten HTML-Ansichten. Tag `meeting-17-11` auf diesem Commit, gepusht.
+  - **Status Testsuites:** Der Auftrag (Kopfzeilen, automatischer Sollwert, `suite:<datei>`, Hash-Warnung) ist seit
+    `62946c9` umgesetzt; heute erneut offline geprüft.
+  - **Geändert (Commit 2):**
+    - `testsuites/make_validation_suites.py` (neu, Startwert `20261117`), `testsuites/val_t1_new.txt` und
+      `testsuites/val_forms.txt` (neu, zurückgehalten, Prompt-Kopfzeile S3.1 als Platzhalter; Regeln §2).
+    - Notebook:
+      - 5.0 neu: Übersicht aller Experimente und Suites mit Prompt, Modell, Aufgaben, Seeds, Status, Läufen und
+        gültigen Aufgaben. Beim „Run All“ erst Platzhalter, am Ende von 5.5 per `display_id` ersetzt.
+      - 5.3: `RUN_EXPERIMENTE = False` (stand nach dem E7.1-Lauf noch auf `True`), danach Aktualisierung der Übersicht.
+      - 5.4: Parser auch für `(b op c) op a`; `HELD_SUITES` (Vorschau ja, Senden nein).
+      - 5.5: Aktualisierung der Übersicht.
+      - Rolands Outputs vom E7.1-Lauf bleiben im Notebook (geprüft: kein API-Key).
+    - `.gitignore`: `.vscode/*` mit Ausnahme `!.vscode/settings.json`, damit `settings.json` (CSV-Grid) im Repo liegt.
+    - Gelöschtes `results/show_one_run.txt` mitcommittet.
+    - Plan §2 (E7.1/S3.2, Validierungs-Suites), §3 (O14), §7 (Zeilen der Suites).
+  - **Fund, behoben:** `suite_sha256` hing von den Zeilenenden ab (Hash über die Rohbytes). Ein Checkout mit CRLF
+    (Windows) und LF hätte unterschiedliche Werte und damit eine falsche „geändert“-Warnung ergeben. Jetzt wird über
+    den Text mit vereinheitlichten Zeilenenden gehasht. `beispiel.txt` (LF) behält `b799c2fc…`. Suite-Läufe gab es
+    noch keine, bestehende Daten sind also nicht betroffen.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt, ganzes Notebook in einer IPython-Shell, aus der
+    Repo-Wurzel und aus `doc/`):**
+    - 34 Code-Zellen fehlerfrei.
+    - 5.0: erst Platzhalter, nach 5.5 durch die Tabelle ersetzt; einzeln ausgeführt sofort die Tabelle. Status wie
+      erwartet: E1b/E4/E7/E7.1 gelaufen mit je 10 Läufen, E1/E2 geplant, E3/E5 zurückgehalten, `beispiel.txt`
+      geplant, beide Validierungs-Suites zurückgehalten.
+    - Parser: 8 gültige Fragen in allen Formen (inkl. Leerzeichen) und 12 Ablehnungen mit dem erwarteten Grund.
+    - Suites: Kopfzeilen, Seeds, Formverteilung 3/3/2/2, alle Regeln, keine Überschneidung mit `poc_items`,
+      `beispiel.txt` oder untereinander.
+    - Generator: deterministisch und dateigleich; die Prüfung ignoriert Prompt-Kopfzeile und Zeilenenden.
+    - Hash: LF = CRLF = BOM; eine geänderte Frage ändert den Hash und löst die Warnung aus.
+    - `HELD_SUITES`: Vorschau ja, Senden verweigert, kein Request, nichts geschrieben.
+    - Bewertung unverändert: Mock-Läufe für alle vier neuen Formen und die T1-Form ergeben ok (strict).
+    - O14 belegt: siehe §3.
+    - Export bytegleich mit Commit 1. Rohdaten, Prompts, Suites und Lucas Dateien unverändert (SHA-256).
+  - **Beim Umsetzen gefunden und behoben (vor dem Commit):** Mein Patch nannte den Dateitext in `load_suite` `text`,
+    wie die Schleifenvariable. Der Hash lief dadurch nur über die letzte Zeile; der Test mit dem bekannten Hash von
+    `beispiel.txt` hat das aufgedeckt.
+  - **Nicht getestet:** Ersetzung per `display_id` in VS Code (nur in der IPython-Shell geprüft); echte Läufe.
+  - **Offen:** O12a–d, O13, O14; S3.2 (nach dem Meeting); die Prompt-Kopfzeile der Validierungs-Suites wird erst mit
+    der finalen S3.x gesetzt.
+  - **Nächster Schritt:** Meeting mit Luca (17.11., 10 Uhr) zur Fortsetzungsmechanik, danach Entscheidung über S3.2.
 
 ## 14. Quellen
 

@@ -1,0 +1,17 @@
+# Validierungs-Suite val_forms: andere Formen: (b*c)+a x3, (a+b)*c x3, a*(b*c) x2, a+(b+c) x2.
+# ZURUECKGEHALTEN: erst nach Festlegung der finalen S3.x-Version laufen lassen (Notebook 5.4: HELD_SUITES).
+# Erzeugt mit testsuites/make_validation_suites.py, Startwert 20261117; Regeln: doc/poc-sprint-plan.md §2.
+# Die Prompt-Kopfzeile ist ein Platzhalter (S3.1); vor dem Lauf auf die finale S3.x setzen.
+# model: qwen-3.8-180b-next
+# prompt: S3.1
+# seed: 221
+Please calculate (7*11)+17
+Please calculate (12*11)+16
+Please calculate (7*4)+35
+Please calculate (9+7)*8
+Please calculate (13+8)*4
+Please calculate (11+13)*7
+Please calculate 4*(12*8)
+Please calculate 7*(4*11)
+Please calculate 40+(29+38)
+Please calculate 20+(27+14)
