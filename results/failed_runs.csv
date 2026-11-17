@@ -25,3 +25,9 @@
 27;16.11.2026 12:34;E7;S3;T1-08 · 32+(7*8);88;;keine_antwort;4;C-FINAL;"Stage 4: keine Antwort, Thinking endet mit <ADD id=""add-1""/>"
 28;16.11.2026 12:34;E7;S3;T1-09 · 11+(8*9);83;83;ok_nach_korrektur;3;K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: keine Antwort)
 29;16.11.2026 12:34;E7;S3;T1-10 · 31+(4*7);59;59;ok_nach_korrektur;3;K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: keine Antwort)
+30;16.11.2026 21:13;E7.1;S3.1;T1-01 · 10+(2*4);18;18;ok_nach_korrektur;2;A-OMIT K-CORR;Stage 3: Tool-Call erst nach Korrektur-Prompt (Stage 2: Hold-Message)
+34;16.11.2026 21:13;E7.1;S3.1;T1-05 · 14+(7*9);77;77;ok_nach_korrektur;3;A-WRONG K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: A-WRONG)
+35;16.11.2026 21:13;E7.1;S3.1;T1-06 · 26+(4*8);58;58;ok_nach_korrektur;2;A-OMIT K-CORR;Stage 3: Tool-Call erst nach Korrektur-Prompt (Stage 2: Hold-Message)
+36;16.11.2026 21:14;E7.1;S3.1;T1-07 · 19+(6*9);73;73;ok_nach_korrektur;3;A-WRONG K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: A-WRONG)
+37;16.11.2026 21:14;E7.1;S3.1;T1-08 · 32+(7*8);88;;haengt_hold_message;3;A-OMIT;Stage 3: Hold-Message statt Tool-Tag, obwohl mul-1=56 in RESULTS standen, auch…
+38;16.11.2026 21:14;E7.1;S3.1;T1-09 · 11+(8*9);83;83;ok_nach_korrektur;2;A-OMIT K-CORR;Stage 3: Tool-Call erst nach Korrektur-Prompt (Stage 2: Hold-Message)
