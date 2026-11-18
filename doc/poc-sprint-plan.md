@@ -1003,6 +1003,17 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
   - **Nicht getestet:** Kausalität des Neuansatzes (TN-024). Kein Request, kein Lauf.
   - **Offen:** O12a–d, O13, O16, O17; Modellwahl Hauptstudie (TN-027, mit Luca).
   - **Nächster Schritt:** Einordnung mit Luca (TN-025 Vertraulichkeit, TN-027 Modellwahl).
+- **2026-11-18 14:12 · Claude Code · Präsentationsdecks, Notizen zu Literatur und Begriffen:**
+  - **Präsentation (Roland):** Decks DE und EN erstellt, je 12 Folien und 3 Folien Anhang, Stand Validierung 18.11.
+    Die Outline-PDFs sind damit überholt.
+    - DE: https://claude.ai/artifact/T88uSYD9VwGKi9eHzvWshj
+    - EN: https://claude.ai/artifact/7TcCpqRuFSm6w1HRPdtVde
+  - **Läufe:** Für die Präsentation sind keine weiteren Läufe nötig; die Modelle können ausgeschaltet werden.
+  - **Thesis-Notizen:** TN-028 (Literatur: Lu et al. 2022, Reihenfolge der Few-Shot-Beispiele, stützt TN-009) und TN-029
+    (Entscheidung Luca: keine internen Kürzel in Folien und Fließtext, Zuordnungstabelle im Anhang) angehängt.
+  - **Geprüft:** 29 Notizen, 19 Spalten, alle TN-Verweise vorhanden, die übrigen Zeilen bytegleich, BOM und LF erhalten.
+    Kein Request, kein Lauf.
+  - **Nächster Schritt:** PoC-Präsentation am Fr 20.11.
 
 ## 14. Quellen
 
