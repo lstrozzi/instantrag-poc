@@ -1,7 +1,6 @@
 # Validierungs-Suite val_t1_new: T1-Form a+(b*c) mit neuen Zahlen.
-# ZURUECKGEHALTEN: erst nach Festlegung der finalen S3.x-Version laufen lassen (Notebook 5.4: HELD_SUITES).
+# Validierung der eingefrorenen Version S3.1 (Plan §2, 17.11.); gesendet wird erst nach Freigabe (Notebook 5.4: HELD_SUITES).
 # Erzeugt mit testsuites/make_validation_suites.py, Startwert 20261117; Regeln: doc/poc-sprint-plan.md §2.
-# Die Prompt-Kopfzeile ist ein Platzhalter (S3.1); vor dem Lauf auf die finale S3.x setzen.
 # model: qwen-3.8-180b-next
 # prompt: S3.1
 # seed: 211

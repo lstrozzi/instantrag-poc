@@ -73,6 +73,9 @@ Unverändert aus S2: Regel 4 (Kanalregel), aus S1 alle übrigen Bereinigungen.
 
 ## S3.1 – Rolle „system“ und Beispiel D (Basis: S3, Iteration 1)
 
+**Eingefroren am 17.11.** (Meeting Luca, Plan §2): E7.1 erreicht das Abbruchkriterium mit 9/10 inkl. Korrektur.
+S3.1 ist die finale Version für die Validierung (VAL-T2, `val_t1_new`, `val_forms`) und für E9 auf M1; S3.2 entfällt.
+
 Ziel: Erfolgsrate auf T1 nach E7 (S3: ok 3, ok_nach_korrektur 2, abbruch_dep 4, keine_antwort 1). Text aus Rolands
 Entwurf übernommen; die Datei hat CRLF und keinen Zeilenumbruch am Ende, wie S3. Der Diff gegen S3 zeigt genau die
 folgenden Stellen (per Skript geprüft: 6 Zeilen entfernt, 15 hinzugefügt, keine weiteren Unterschiede). Auch S3.1

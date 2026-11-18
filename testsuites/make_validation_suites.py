@@ -7,8 +7,8 @@ across Python versions). The inputs are this file and the frozen config/poc_item
     python testsuites/make_validation_suites.py
 
 A suite file is written only if it does not exist yet. An existing file is compared with the generated text; the
-"# prompt:" header is ignored, because it is set to the final S3.x version before the validation run.
-Decision and rules: doc/poc-sprint-plan.md §2 (2026-11-17).
+"# prompt:" header is not compared, because the tasks do not depend on it.
+Decision and rules: doc/poc-sprint-plan.md §2 (2026-11-17); prompt S3.1 frozen on 2026-11-17.
 """
 import json
 import random
@@ -20,7 +20,7 @@ SEED = 20261117
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 MODEL = "qwen-3.8-180b-next"  # M2, as in the S3.x development runs
-PROMPT_PLACEHOLDER = "S3.1"   # the suite format needs a registered version; set the final S3.x before the run
+PROMPT = "S3.1"               # frozen version for the validation (plan §2, 2026-11-17)
 
 # numbers of the prompt examples in S3.1 (A-C: 2, 3, 5, 15; D: 3, 5, 6, 18, 23): never operand or result
 EXAMPLE_NUMBERS = {2, 3, 5, 6, 15, 18, 23}
@@ -98,11 +98,11 @@ def generate_lines(rng, forms, triples):
 def suite_text(name, seed, description, lines):
     head = [
         f"# Validierungs-Suite {Path(name).stem}: {description}.",
-        "# ZURUECKGEHALTEN: erst nach Festlegung der finalen S3.x-Version laufen lassen (Notebook 5.4: HELD_SUITES).",
+        f"# Validierung der eingefrorenen Version {PROMPT} (Plan §2, 17.11.); gesendet wird erst nach Freigabe "
+        "(Notebook 5.4: HELD_SUITES).",
         f"# Erzeugt mit testsuites/make_validation_suites.py, Startwert {SEED}; Regeln: doc/poc-sprint-plan.md §2.",
-        f"# Die Prompt-Kopfzeile ist ein Platzhalter ({PROMPT_PLACEHOLDER}); vor dem Lauf auf die finale S3.x setzen.",
         f"# model: {MODEL}",
-        f"# prompt: {PROMPT_PLACEHOLDER}",
+        f"# prompt: {PROMPT}",
         f"# seed: {seed}",
     ]
     return "\n".join(head + lines) + "\n"

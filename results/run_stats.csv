@@ -1,5 +1,5 @@
-﻿experiment;prompt_version;model;laeufe;infra_fehler;n_bewertet;weitere_laeufe;ok;ok_nach_korrektur;abbruch_dep;haengt_hold_message;keine_antwort;falsche_antwort;protokollfehler;rate_ok;rate_ok_ki_low;rate_ok_ki_high;rate_ok_inkl_korrektur;rate_ok_inkl_korrektur_ki_low;rate_ok_inkl_korrektur_ki_high
-E4;S1;qwen-3.8-180b-next;10;0;10;0;0;5;4;0;1;0;0;0,0;0,0;0,278;0,5;0,237;0,763
-E1b;S0;qwen-3.8-180b-next;10;0;10;0;1;3;3;3;0;0;0;0,1;0,018;0,404;0,4;0,168;0,687
-E7;S3;qwen-3.8-180b-next;10;0;10;0;3;2;4;0;1;0;0;0,3;0,108;0,603;0,5;0,237;0,763
-E7.1;S3.1;qwen-3.8-180b-next;10;0;10;0;4;5;0;1;0;0;0;0,4;0,168;0,687;0,9;0,596;0,982
+﻿experiment;prompt_version;model;laeufe;infra_fehler;n_bewertet;weitere_laeufe;ok;ok_nach_korrektur;abbruch_dep;haengt_hold_message;keine_antwort;falsche_antwort;protokollfehler;mit_leak;rate_ok;rate_ok_ki_low;rate_ok_ki_high;rate_ok_inkl_korrektur;rate_ok_inkl_korrektur_ki_low;rate_ok_inkl_korrektur_ki_high
+E4;S1;qwen-3.8-180b-next;10;0;10;0;0;5;4;0;1;0;0;5;0,0;0,0;0,278;0,5;0,237;0,763
+E1b;S0;qwen-3.8-180b-next;10;0;10;0;1;3;3;3;0;0;0;3;0,1;0,018;0,404;0,4;0,168;0,687
+E7;S3;qwen-3.8-180b-next;10;0;10;0;3;2;4;0;1;0;0;5;0,3;0,108;0,603;0,5;0,237;0,763
+E7.1;S3.1;qwen-3.8-180b-next;10;0;10;0;4;5;0;1;0;0;0;3;0,4;0,168;0,687;0,9;0,596;0,982

@@ -60,6 +60,11 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | 2026-11-16 21:03 | **Entwicklungsprotokoll S3.x:** T1 ist das Entwicklungsset. Ausgangspunkt ist E7 (S3); jede Iteration ist eine Unterversion S3.N mit eigener Datei und eigenem Experiment E7.N auf T1 mit den Seeds 101–110. Abbruch, sobald eine Iteration ≥ 8/10 funktional erreicht, spätestens nach 4 Iterationen (S3.1–S3.4). Danach wird die Version eingefroren und einmalig validiert: auf T2 (Seeds 201–210) und einer neuen Testsuite (Seeds ab 211). Erste Iteration: S3.1 (Begriff „system“, Satz zur RESULTS-Rolle, Hervorhebung der Regeln, Beispiel D), Experiment E7.1, Vergleich E7 → E7.1. Die lokale Änderung an `instantrag_s3.txt` ist in S3.1 aufgegangen; S3 steht wieder auf dem Stand, mit dem E7 lief (`25b1074a…`). | T1-Raten nach mehreren Iterationen sind durch die Auswahl der besten Version nach oben verzerrt; aussagekräftig ist erst die Validierung auf T2 und der neuen Suite (§3, O13). Die Suite-Seeds beginnen bei 211, weil T2 fest 201–210 belegt. 8/10 entspricht der Schwelle von H1. Lauf nur nach Rolands Freigabe. |
 | 2026-11-17 01:29 | **E7.1 (S3.1) erreicht das Abbruchkriterium nicht:** 4/10 funktional, 9/10 inkl. Korrektur. S3.2 wird zurückgestellt bis zur Entscheidung mit Luca (17.11., 10 Uhr) zur Fortsetzungsmechanik. | Der Engpass liegt vermutlich im Harness, nicht im Prompt (Einschätzung Roland, Läufe Nr. 30 und 34). Datenstand für das Meeting: Tag `meeting-17-11` (Commit `51da4b5`). |
 | 2026-11-17 01:29 | **Validierungs-Suites vorbereitet und zurückgehalten:** `testsuites/val_t1_new.txt` (10 × a+(b·c), Seeds 211–220) und `testsuites/val_forms.txt` ((b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230), beide M2. Erzeugt mit `testsuites/make_validation_suites.py`, **Startwert `20261117`**; `python testsuites/make_validation_suites.py` schreibt fehlende Dateien und prüft vorhandene. Regeln: wie `config/poc_items.json` (Ganzzahlen, keine 0/1, Zwischen- und Endergebnis mehrstellig und verschieden, alle Ergebnisse einer Suite verschieden), dazu paarweise verschiedene Operanden, keine Zahl aus den S3.1-Beispielen {2, 3, 5, 6, 15, 18, 23} als Operand oder Ergebnis, kein Operanden-Tripel aus T1/T2 oder der anderen Suite. **Prompt-Kopfzeile S3.1 ist ein Platzhalter**, weil das Suite-Format eine registrierte Version verlangt: vor dem Validierungslauf auf die finale S3.x setzen. `HELD_SUITES` (Notebook 5.4) sperrt das Senden. Der Suite-Parser akzeptiert zusätzlich `(b op c) op a` (Freigabe Roland); die Bewertung bleibt unverändert. | Validierung nach dem Entwicklungsprotokoll (16.11. 21:03): neue Zahlen in T1-Form und andere Formen. Faktoren 4, 7, 8, 9, 11, 12, weil einstellige Faktoren ohne 6 keine 10 verschiedenen Produkte ergeben. Bringt eine spätere S3.x neue Beispiele, sind deren Zahlen vor dem Lauf gegen die Suites zu prüfen. |
+| 2026-11-17 10:00 | **Erfolg = inkl. Korrektur (Meeting Luca):** „ok nach Korrektur“ zählt als Erfolg, weil die Korrektur zum System gehört. Hauptmaß ist damit die Stufe **lenient** (Export: `ok` + `ok_nach_korrektur`, `rate_ok_inkl_korrektur`); die Rate ohne Korrektur (funktional, `rate_ok`) wird weiter berichtet. | Die Erfolgsdefinition wurde nach Sicht auf die E7.1-Daten geändert; das ist offen gekennzeichnet (O15). §8 und Notebook 6.1 angepasst; 6.8 zeigt die gepaarten Vergleiche auf beiden Stufen. H1 bleibt „funktionaler Erfolg im ersten Versuch“. |
+| 2026-11-17 10:00 | **Leaks (Meeting Luca):** Ein Leak zählt als funktionaler Erfolg und wird als Protokollabweichung (A-LEAK) separat ausgewiesen. | Entspricht der bestehenden Definition (§8: funktional = strict mit erlaubtem Leak; A-LEAK ist kein Fehlercode in 6.3), **keine Rate ändert sich** (geprüft 18.11.). Ausgewiesen über den Abstand strict ↔ funktional (6.6), die Spalte `leak` (`run_summary.csv`) und neu `mit_leak` (`run_stats.csv`). |
+| 2026-11-17 10:00 | **Abbruchkriterium erreicht, S3.1 eingefroren (Meeting Luca):** E7.1 erreicht 9/10 inkl. Korrektur (funktional 4/10). S3.2 entfällt; die Zurückstellung von 01:29 ist damit erledigt. | Das Kriterium vom 16.11. 21:03 lautete „≥ 8/10 funktional“; erreicht ist es erst mit der Erfolgsdefinition oben (O15). |
+| 2026-11-17 10:00 | **Validierung am 18.11. (Vormittag) auf M2 mit S3.1 (Meeting Luca):** T2 als Experiment **VAL-T2** (S3.1 · M2 · T2, Seeds 201–210), dazu `suite:val_t1_new.txt` und `suite:val_forms.txt`. Alle drei sind zurückgehalten (`active = False` bzw. `HELD_SUITES`) bis zu Rolands Freigabe. | ID VAL-T2 statt V1 (Roland, 18.11.), weil V1 in §6 die Messvoraussetzung „Unabhängigkeit“ bezeichnet. Die Prompt-Kopfzeile S3.1 der Suites ist jetzt die eingefrorene Version; die Kommentarzeilen wurden vor dem ersten Lauf endgültig formuliert, die Fragen sind unverändert. |
+| 2026-11-18 01:12 | **E9 = S3.1 · M1 (`qwen-3.5-35b`) · T1**, Seeds 101–110; Vergleiche E1 → E9 (Prompt S0 → S3.1 auf M1) und E7.1 → E9 (Modell M2 → M1 mit S3.1). E1 und E9 sind aktiv; Roland startet beide Läufe selbst auf M1 (geplant: Nacht zum 18.11.). Notebook 5.3 ist darauf vorbereitet (`EXPERIMENTE = ["E1", "E9"]`, `RUN_EXPERIMENTE = False`). | E1 hat bisher 0 Läufe (M1 war am 15.11. nicht erreichbar); E1 → E9 bekommt erst damit Paare. Nach 2 I-ERR in Folge bricht die Schleife ein Experiment ab. |
 | 2026-11-16 00:25 | O4: Repo ist privat (nur Roland und Luca) → `results/runs.jsonl` und `results/playground.jsonl` werden committet; `results/selftest.jsonl` bleibt lokal (`.gitignore`). | Rohdaten der Experimente gehören zum Reproduzierbarkeitspaket; Selbsttest-Zeilen entstehen bei jedem „Run All“ und sind keine Daten. |
 
 ## 3. Offene Entscheidungen (vor der Umsetzung klären)
@@ -83,6 +88,22 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | O12d | Thinking-Text im Antwortkanal: Bei E1b T1-04 und T1-07 steht im `content` erst Thinking-Text, dann `</think>`, dann nur die Hold-Message. `final_value` liest daraus 48 bzw. 2 als Endantwort und vergibt C-FINAL; tatsächlich gab es keine Endantwort (Export 16.11., echte Daten). | Für Endantwort, B-PREM und A-LEAK nur den Text nach dem letzten `</think>` als Antwort werten, den Teil davor als Thinking; zusätzlich beschreibend markieren. Der Export 6.10 nutzt diese Regel bereits für die Hold-Erkennung | offen – noch nicht umgesetzt |
 | O13 | Auswahleffekt im Entwicklungsprotokoll S3.x: Bis zu 4 Iterationen auf denselben 10 T1-Aufgaben (gleiche Seeds) heben die T1-Rate der gewählten Version systematisch an; bei n = 10 und T = 0,1 kann auch Zufall eine Iteration über 8/10 bringen. | T1-Raten der S3.x-Iterationen nur als Entwicklungsdaten berichten; Aussagen zur Wirkung nur aus der einmaligen Validierung (T2 + neue Suite) der eingefrorenen Version; Anzahl der Iterationen in der Thesis nennen | offen |
 | O14 | Gleichartige Operationen in `val_forms` (`a*(b*c)`, `a+(b+c)`): Eine mathematisch gleichwertige andere Reihenfolge (für `4*(12*8)` erst `4*12`, dann `48*8`) ergibt A-WRONG in beiden Stages und bei richtiger Endantwort die Kategorie `protokollfehler` (offline belegt, 17.11.). | So lassen (Protokollregel „innerste zuerst“), in der Auswertung der Validierung aber getrennt ausweisen | offen |
+| O15 | Nachträgliche Umstellung der Erfolgsdefinition: Das Abbruchkriterium vom 16.11. 21:03 lautete „≥ 8/10 funktional“. E7.1 erfüllt es erst mit „Erfolg inkl. Korrektur“ (Luca, 17.11.), beschlossen nach Sicht auf die E7.1-Daten (funktional 4/10, inkl. Korrektur 9/10). | In §2 als begründete Änderung kennzeichnen (die Korrektur gehört zum System) und in der Thesis offenlegen; H1 („funktionaler Erfolg im ersten Versuch“) unverändert lassen und die lenient-Rate zusätzlich berichten | entschieden 18.11. (Roland): wie vorgeschlagen |
+
+**Thesis-Phase (nach Anmeldung, nicht im PoC)**
+
+- **TP1 – Stage 4 entfällt (Vorschlag Luca, 17.11.):** Nach dem letzten Ergebnis soll das Modell schon in Stage 3 die
+  Antwort geben (natürliche Fortsetzung statt Neuansatz).
+  - **Umsetzung:** ein neutraler Continue-Prompt (Rolle `user`) **vor** dem Resume-Präfix statt des heutigen
+    Korrektur-Prompts („Continue the calculation: emit the remaining empty tool-call …“). Das betrifft den Harness
+    (Lucas Datei) und gehört deshalb in die Thesis-Phase.
+  - **Mögliche Messgrößen:** Inferenzrunden pro Aufgabe, Neustart-Rate nach dem Präfix, Tokens bis zur Antwort.
+  - **Aus den heutigen Rohdaten schon ableitbar [Code]:** Inferenzrunden = Zahl der Requests je Lauf (`turns`). Ein
+    Neustart nach dem Präfix ist nur als Indiz messbar, über `prefix_echo` je Stage (wiederholt das Thinking das
+    gesendete Präfix?, §4.1). Tokens nur für abgeschlossene Streams, weil abgefangene Streams keine Usage liefern
+    (§4.4).
+  - **Beispiel:** T1-10 (31+(4*7)), Stage 3 → 4, in den Daten z. B. E7, Lauf Nr. 29: Stage 3 ohne Antwort,
+    Endantwort erst in Stage 4 nach dem Korrektur-Prompt.
 
 ## 4. Befundlage (Analyse 2026-11-14)
 
@@ -190,8 +211,10 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
 | E6 | optional bis Fr | Server liefert falsche Werte (Eingriff von außen) | S1 | M1 | T1 | 10 | E2 |
 | E7 | ab 16.11., nach Freigabe | Prompt-Paket S3 (16.11.) | S3 | M2 | T1 | 10 | E4 (S1 → S3), E1b (S0 → S3), gleiche Aufgaben und Seeds |
 | E7.1 | ab 16.11., nach Freigabe | S3-Iteration 1: S3.1 (Entwicklungsprotokoll §2) | S3.1 | M2 | T1 | 10 | E7 (S3 → S3.1), gleiche Aufgaben und Seeds |
-| suite:val_t1_new.txt | nach Einfrieren der finalen S3.x (zurückgehalten) | Validierung: T1-Form, neue Zahlen | finale S3.x (Kopfzeile derzeit S3.1) | M2 | a+(b·c), Seeds 211–220 | 10 | finale E7.N auf T1 |
-| suite:val_forms.txt | nach Einfrieren der finalen S3.x (zurückgehalten) | Validierung: andere Formen | finale S3.x (Kopfzeile derzeit S3.1) | M2 | (b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230 | 10 | – |
+| E9 | Nacht zum 18.11., Lauf durch Roland | Modell M2 → M1 mit der eingefrorenen S3.1 | S3.1 | M1 | T1 | 10 | E1 (S0 → S3.1 auf M1), E7.1 (M2 → M1), gleiche Aufgaben und Seeds |
+| VAL-T2 | 18.11. vormittags, nach Freigabe (zurückgehalten) | Validierung: Aufgabentyp T2 | S3.1 (eingefroren) | M2 | T2, Seeds 201–210 | 10 | – (andere Aufgaben als E7.1) |
+| suite:val_t1_new.txt | 18.11. vormittags, nach Freigabe (zurückgehalten) | Validierung: T1-Form, neue Zahlen | S3.1 (eingefroren) | M2 | a+(b·c), Seeds 211–220 | 10 | E7.1 (T1, gleiche Form, andere Zahlen) |
+| suite:val_forms.txt | 18.11. vormittags, nach Freigabe (zurückgehalten) | Validierung: andere Formen | S3.1 (eingefroren) | M2 | (b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230 | 10 | – |
 | E8 | nach Klärung mit Luca | RESULTS im System-Inhalt an Position 0 (O9) | – | – | T1 | 10 | offen |
 
 **V0 im Detail:** (a) `/v1/models` abfragen; (b) Cache: Referenz-Request zweimal identisch, dann mit anderem
@@ -233,8 +256,9 @@ ist fest (innerste zuerst).
   Cache-Treffer – Letzterer aus den Rohdaten bisher nicht erkennbar) – getrennt berichtet
 
 **Erfolgsstufen:** **strict** – alles korrekt, kein Leak, keine Korrektur · **funktional** – Leak erlaubt,
-keine Korrektur (Hauptmaßstab, weil der Harness Leaks verarbeitet; „strict“ ist die RQ3-Sicht) ·
-**lenient** – wie funktional, Korrektur erlaubt.
+keine Korrektur (bis 17.11. Hauptmaßstab, weil der Harness Leaks verarbeitet; „strict“ ist die RQ3-Sicht) ·
+**lenient** – wie funktional, Korrektur erlaubt (**Hauptmaß seit 17.11.**, Entscheidung Luca: die Korrektur gehört
+zum System; funktional wird weiter berichtet, §2 und O15).
 
 ## 9. Notebook-Spezifikation `proof-of-concept.ipynb` (freigegeben 15.11.; ein Notebook mit Abschnitt pro Phase)
 
@@ -741,6 +765,49 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
   - **Offen:** O12a–d, O13, O14; S3.2 (nach dem Meeting); die Prompt-Kopfzeile der Validierungs-Suites wird erst mit
     der finalen S3.x gesetzt.
   - **Nächster Schritt:** Meeting mit Luca (17.11., 10 Uhr) zur Fortsetzungsmechanik, danach Entscheidung über S3.2.
+- **2026-11-18 01:14 · Claude Code · Ergebnisse Meeting Luca (17.11.), E9 und Validierung vorbereitet:**
+  - **Entscheidungen (§2):**
+    - Luca, 17.11.: Erfolg = inkl. Korrektur (Hauptmaß lenient, beide Raten werden berichtet); Leak = funktionaler
+      Erfolg mit A-LEAK separat ausgewiesen; Abbruchkriterium erreicht (E7.1 9/10), S3.1 eingefroren, S3.2 entfällt;
+      Validierung am 18.11. vormittags auf M2 mit S3.1.
+    - Roland, 18.11.: ID VAL-T2 statt V1; O15 wie vorgeschlagen; E1 und E9 aktiv, Roland lässt beide auf M1 laufen.
+  - **Prüfung „Leak = funktionaler Erfolg“:** Das entspricht der bestehenden Definition. Im Code ist A-LEAK kein
+    Fehlercode (6.3); funktional ist strict mit erlaubtem Leak (§8). Keine Rate ändert sich: Alle Spalten von
+    `run_stats.csv` außer der neuen `mit_leak` sind gleich dem Stand von `c0d4a12`.
+  - **Geändert:**
+    - Notebook:
+      - 5.1 Register: E9 (S3.1 · M1 · T1, aktiv) und VAL-T2 (S3.1 · M2 · T2, `active = False`).
+      - 5.3 vorbereitet auf `EXPERIMENTE = ["E1", "E9"]`, `RUN_EXPERIMENTE = False`.
+      - 6.6 Vergleiche E1 → E9 und E7.1 → E9; 6.8 Vergleiche auf beiden Stufen (lenient und funktional).
+      - 6.1 und §8: Hauptmaß lenient.
+      - 6.10: `run_stats.csv` mit Spalte `mit_leak`.
+      - 5.4: Texte und `HELD_SUITES`-Hinweise auf die eingefrorene S3.1 umgestellt.
+      - 5.2: Die Ablehnungsprüfung nutzte „E9“ als Beispiel für ein unbekanntes Experiment; jetzt „E99“, dazu wird
+        VAL-T2 als zurückgehalten geprüft (der Test hat das aufgedeckt).
+    - `testsuites/val_t1_new.txt`, `testsuites/val_forms.txt`: Kommentarzeilen vor dem ersten Lauf endgültig
+      formuliert (kein „Platzhalter“ mehr), per Generator neu erzeugt. Fragen, Seeds, Modell und `# prompt: S3.1`
+      sind unverändert. `make_validation_suites.py` entsprechend angepasst.
+    - Plan §2 (fünf Zeilen), §3 (O15, Thesis-Phase TP1), §7 (E9, VAL-T2, Suites mit S3.1), §8;
+      `doc/prompt-versions.md`: S3.1 eingefroren.
+    - `results/run_stats.csv` neu erzeugt (Spalte `mit_leak`: E4 5, E1b 3, E7 5, E7.1 3).
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt, ganzes Notebook in einer IPython-Shell, aus der
+    Repo-Wurzel und aus `doc/`):**
+    - 34 Code-Zellen fehlerfrei, einschließlich 5.2 und 6.7.
+    - 5.3: Vorschau E1 + E9 mit 20 offenen Läufen auf `qwen-3.5-35b`, nichts gesendet; VAL-T2 wird abgewiesen.
+    - Übersicht 5.0: E1/E9 geplant, VAL-T2 und beide Validierungs-Suites zurückgehalten, keine Hash-Warnung.
+    - 6.8: Vergleiche auf beiden Stufen. Auf den echten Daten E7 → E7.1: Erfolge 5 → 9 (lenient) und 3 → 4
+      (funktional).
+    - Mock E1 + E9 (A.1-Replay als Modellersatz): 20 Läufe, 60 Requests; jeder Request-Body mit S0 bzw. S3.1,
+      `qwen-3.5-35b` und Seed 101–110. E1 → E9 und E7.1 → E9 mit je 10 Paaren auf beiden Stufen.
+    - Export: `mit_leak` = Zahl der Läufe mit `leak = ja` je Experiment; übrige Spalten unverändert;
+      `run_summary.csv`, `failed_runs.csv` und `task_matrix.csv` bytegleich.
+    - Suites: Generator „identisch“, Fragen gleich dem Stand `c0d4a12`, weiterhin zurückgehalten.
+    - Rohdaten, Prompts und Lucas Dateien unverändert (SHA-256). Kein Request.
+  - **Nicht getestet:** Erreichbarkeit von M1 (zuletzt HTTP 500 am 15.11.); echte Läufe; Darstellung in VS Code.
+  - **Offen:** O12a–d, O13, O14.
+  - **Nächster Schritt:**
+    - Roland: E1 + E9 auf M1 (5.3 `RUN_EXPERIMENTE = True`), danach Export 6.10.
+    - 18.11. vormittags nach Freigabe: VAL-T2 `active = True`, `HELD_SUITES` leeren, Läufe, danach Export.
 
 ## 14. Quellen
 
