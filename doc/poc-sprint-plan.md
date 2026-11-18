@@ -70,6 +70,8 @@ Zeilen vor; angehängt wird erst nach Rolands Freigabe. Nie löschen, Zeiten Eur
 | 2026-11-17 10:00 | **Abbruchkriterium erreicht, S3.1 eingefroren (Meeting Luca):** E7.1 erreicht 9/10 inkl. Korrektur (funktional 4/10). S3.2 entfällt; die Zurückstellung von 01:29 ist damit erledigt. | Das Kriterium vom 16.11. 21:03 lautete „≥ 8/10 funktional“; erreicht ist es erst mit der Erfolgsdefinition oben (O15). |
 | 2026-11-17 10:00 | **Validierung am 18.11. (Vormittag) auf M2 mit S3.1 (Meeting Luca):** T2 als Experiment **VAL-T2** (S3.1 · M2 · T2, Seeds 201–210), dazu `suite:val_t1_new.txt` und `suite:val_forms.txt`. Alle drei sind zurückgehalten (`active = False` bzw. `HELD_SUITES`) bis zu Rolands Freigabe. | ID VAL-T2 statt V1 (Roland, 18.11.), weil V1 in §6 die Messvoraussetzung „Unabhängigkeit“ bezeichnet. Die Prompt-Kopfzeile S3.1 der Suites ist jetzt die eingefrorene Version; die Kommentarzeilen wurden vor dem ersten Lauf endgültig formuliert, die Fragen sind unverändert. |
 | 2026-11-18 01:12 | **E9 = S3.1 · M1 (`qwen-3.5-35b`) · T1**, Seeds 101–110; Vergleiche E1 → E9 (Prompt S0 → S3.1 auf M1) und E7.1 → E9 (Modell M2 → M1 mit S3.1). E1 und E9 sind aktiv; Roland startet beide Läufe selbst auf M1 (geplant: Nacht zum 18.11.). Notebook 5.3 ist darauf vorbereitet (`EXPERIMENTE = ["E1", "E9"]`, `RUN_EXPERIMENTE = False`). | E1 hat bisher 0 Läufe (M1 war am 15.11. nicht erreichbar); E1 → E9 bekommt erst damit Paare. Nach 2 I-ERR in Folge bricht die Schleife ein Experiment ab. |
+| 2026-11-18 11:59 | **Vorab-Kriterium der Validierung (Roland, festgelegt vor dem ersten Validierungslauf):** Je Validierungsset (T2 = VAL-T2, `val_t1_new`, `val_forms`; auf M2 und M1 jeweils getrennt angewandt) gilt: lenient ≥ 8/10 = gestützt, ≤ 5/10 = nicht gestützt, 6–7/10 = offen. Funktional wird mitberichtet. **S3.1 wird nach Sicht auf die Validierungsergebnisse nicht mehr geändert.** | Steht fest, bevor Daten vorliegen (anders als O15). Die Schwellen entsprechen H1. n = 10 je Set, die Wilson-KI sind breit (TN-002). |
+| 2026-11-18 11:59 | **Validierung freigegeben (Roland, 18.11.):** VAL-T2 aktiv, `HELD_SUITES` leer. Zusätzlich M1: **VAL-T2-M1** (S3.1 · M1 · T2, Seeds 201–210) und beide Suites als eigene Experimente `suite:<datei>@M1`. Die Suites laufen mit Modell-Überschreibung beim Lauf; Datei und `suite_sha256` bleiben unverändert, ebenso Aufgaben und Seeds. **Reihenfolge:** alle M2-Läufe zuerst (VAL-T2, dann beide Suites), danach M1 (VAL-T2-M1, dann beide Suites @M1). Jedes Experiment und jeder Suite-Lauf bricht nach 2 I-ERR in Folge ab (Notebook 5.3, 5.5). | Die eigene Experiment-ID verhindert, dass M2-Läufe die M1-Aufgaben als erledigt markieren, und hält die Raten der Modelle getrennt. Gepaart wird über Aufgabe und Seed (Vergleiche M2 → M1 in 6.6). |
 | 2026-11-16 00:25 | O4: Repo ist privat (nur Roland und Luca) → `results/runs.jsonl` und `results/playground.jsonl` werden committet; `results/selftest.jsonl` bleibt lokal (`.gitignore`). | Rohdaten der Experimente gehören zum Reproduzierbarkeitspaket; Selbsttest-Zeilen entstehen bei jedem „Run All“ und sind keine Daten. |
 
 ## 3. Offene Entscheidungen (vor der Umsetzung klären)
@@ -92,7 +94,7 @@ Zeilen vor; angehängt wird erst nach Rolands Freigabe. Nie löschen, Zeiten Eur
 | O12c | B-PREM erkennt nur den richtigen Sollwert: eine vorzeitige falsche Zahl („The result is 61.“) und `42.0` bleiben unerkannt; `<MUL x1="6" x2="7" result="42"/>` gilt als strict (nur B-SELF). H3 kann so 0 Fälle melden (Review 15.11., offline belegt). | B-PREM für jede Zahl im Antwortkanal einer Nicht-End-Stage, die weder aus der Frage noch aus RESULTS stammt; Zahl in einem Zusatzattribut als B-FORGE | offen – noch nicht umgesetzt |
 | O12d | Thinking-Text im Antwortkanal: Bei E1b T1-04 und T1-07 steht im `content` erst Thinking-Text, dann `</think>`, dann nur die Hold-Message. `final_value` liest daraus 48 bzw. 2 als Endantwort und vergibt C-FINAL; tatsächlich gab es keine Endantwort (Export 16.11., echte Daten). | Für Endantwort, B-PREM und A-LEAK nur den Text nach dem letzten `</think>` als Antwort werten, den Teil davor als Thinking; zusätzlich beschreibend markieren. Der Export 6.10 nutzt diese Regel bereits für die Hold-Erkennung | offen – noch nicht umgesetzt |
 | O13 | Auswahleffekt im Entwicklungsprotokoll S3.x: Bis zu 4 Iterationen auf denselben 10 T1-Aufgaben (gleiche Seeds) heben die T1-Rate der gewählten Version systematisch an; bei n = 10 und T = 0,1 kann auch Zufall eine Iteration über 8/10 bringen. | T1-Raten der S3.x-Iterationen nur als Entwicklungsdaten berichten; Aussagen zur Wirkung nur aus der einmaligen Validierung (T2 + neue Suite) der eingefrorenen Version; Anzahl der Iterationen in der Thesis nennen | offen |
-| O14 | Gleichartige Operationen in `val_forms` (`a*(b*c)`, `a+(b+c)`): Eine mathematisch gleichwertige andere Reihenfolge (für `4*(12*8)` erst `4*12`, dann `48*8`) ergibt A-WRONG in beiden Stages und bei richtiger Endantwort die Kategorie `protokollfehler` (offline belegt, 17.11.). | So lassen (Protokollregel „innerste zuerst“), in der Auswertung der Validierung aber getrennt ausweisen | offen |
+| O14 | Gleichartige Operationen in `val_forms` (`a*(b*c)`, `a+(b+c)`): Eine mathematisch gleichwertige andere Reihenfolge (für `4*(12*8)` erst `4*12`, dann `48*8`) ergibt A-WRONG in beiden Stages und bei richtiger Endantwort die Kategorie `protokollfehler` (offline belegt, 17.11.). | So lassen (Protokollregel „innerste zuerst“), in der Auswertung der Validierung aber getrennt ausweisen | umgesetzt 18.11.: Export 6.10 weist `gleiche_operation` und `andere_reihenfolge` je Lauf aus (`run_summary.csv`), die Anzahlen je Experiment stehen in `run_stats.csv`, dazu gibt es eine eigene Tabelle in 6.10; die Raten sind unverändert |
 | O15 | Nachträgliche Umstellung der Erfolgsdefinition: Das Abbruchkriterium vom 16.11. 21:03 lautete „≥ 8/10 funktional“. E7.1 erfüllt es erst mit „Erfolg inkl. Korrektur“ (Luca, 17.11.), beschlossen nach Sicht auf die E7.1-Daten (funktional 4/10, inkl. Korrektur 9/10). | In §2 als begründete Änderung kennzeichnen (die Korrektur gehört zum System) und in der Thesis offenlegen; H1 („funktionaler Erfolg im ersten Versuch“) unverändert lassen und die lenient-Rate zusätzlich berichten | entschieden 18.11. (Roland): wie vorgeschlagen |
 
 **Thesis-Phase (nach Anmeldung, nicht im PoC)**
@@ -235,9 +237,12 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
 | E7 | ab 16.11., nach Freigabe | Prompt-Paket S3 (16.11.) | S3 | M2 | T1 | 10 | E4 (S1 → S3), E1b (S0 → S3), gleiche Aufgaben und Seeds |
 | E7.1 | ab 16.11., nach Freigabe | S3-Iteration 1: S3.1 (Entwicklungsprotokoll §2) | S3.1 | M2 | T1 | 10 | E7 (S3 → S3.1), gleiche Aufgaben und Seeds |
 | E9 | gelaufen 18.11. 01:26–01:27 (Roland) | Modell M2 → M1 mit der eingefrorenen S3.1 | S3.1 | M1 | T1 | 10 | E1 (S0 → S3.1 auf M1), E7.1 (M2 → M1), gleiche Aufgaben und Seeds · **Ergebnis:** 10/10 auf allen Stufen, keine Korrektur; E1 → E9 6:0, p = 0,031 (beide Stufen); E7.1 → E9 funktional 6:0, p = 0,031, inkl. Korrektur 1:0, p = 1,0 |
-| VAL-T2 | 18.11. vormittags, nach Freigabe (zurückgehalten) | Validierung: Aufgabentyp T2 | S3.1 (eingefroren) | M2 | T2, Seeds 201–210 | 10 | – (andere Aufgaben als E7.1) |
-| suite:val_t1_new.txt | 18.11. vormittags, nach Freigabe (zurückgehalten) | Validierung: T1-Form, neue Zahlen | S3.1 (eingefroren) | M2 | a+(b·c), Seeds 211–220 | 10 | E7.1 (T1, gleiche Form, andere Zahlen) |
-| suite:val_forms.txt | 18.11. vormittags, nach Freigabe (zurückgehalten) | Validierung: andere Formen | S3.1 (eingefroren) | M2 | (b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230 | 10 | – |
+| VAL-T2 | 18.11., freigegeben – Schritt 1 (M2) | Validierung: Aufgabentyp T2 | S3.1 (eingefroren) | M2 | T2, Seeds 201–210 | 10 | – (andere Aufgaben als E7.1); Vorab-Kriterium §2 |
+| suite:val_t1_new.txt | 18.11., freigegeben – Schritt 2 (M2) | Validierung: T1-Form, neue Zahlen | S3.1 (eingefroren) | M2 | a+(b·c), Seeds 211–220 | 10 | E7.1 (T1, gleiche Form, andere Zahlen); Vorab-Kriterium §2 |
+| suite:val_forms.txt | 18.11., freigegeben – Schritt 2 (M2) | Validierung: andere Formen | S3.1 (eingefroren) | M2 | (b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230 | 10 | Vorab-Kriterium §2; O14 getrennt ausgewiesen |
+| VAL-T2-M1 | 18.11., freigegeben – Schritt 3 (M1) | Validierung: T2 auf M1 | S3.1 (eingefroren) | M1 | T2, Seeds 201–210 | 10 | VAL-T2 (Modell M2 → M1, gepaart); Vorab-Kriterium §2 |
+| suite:val_t1_new.txt@M1 | 18.11., freigegeben – Schritt 4 (M1) | Validierung: T1-Form, neue Zahlen, auf M1 | S3.1 (eingefroren) | M1 | wie `val_t1_new`, Seeds 211–220 | 10 | `suite:val_t1_new.txt` (M2 → M1, gepaart); Vorab-Kriterium §2 |
+| suite:val_forms.txt@M1 | 18.11., freigegeben – Schritt 4 (M1) | Validierung: andere Formen, auf M1 | S3.1 (eingefroren) | M1 | wie `val_forms`, Seeds 221–230 | 10 | `suite:val_forms.txt` (M2 → M1, gepaart); Vorab-Kriterium §2 |
 | E8 | nach Klärung mit Luca | RESULTS im System-Inhalt an Position 0 (O9) | – | – | T1 | 10 | offen |
 
 **V0 im Detail:** (a) `/v1/models` abfragen; (b) Cache: Referenz-Request zweimal identisch, dann mit anderem
@@ -884,6 +889,45 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
   - **Geprüft:** 20 Notizen, 19 Spalten je Zeile, alle TN-Verweise vorhanden, die übrigen Zeilen bytegleich, BOM und
     LF erhalten.
   - **Nächster Schritt:** Validierung nach Rolands Freigabe.
+- **2026-11-18 12:02 · Claude Code · Validierung freigeschaltet, M1-Validierung vorbereitet, O14, TN-021:**
+  - **Entscheidungen Roland (18.11., §2):**
+    - Validierung freigegeben, zusätzlich auf M1 (VAL-T2-M1 und Suites @M1).
+    - Reihenfolge: alle M2-Läufe zuerst, danach M1. Abbruch nach 2 I-ERR in Folge, auch für Suite-Läufe.
+    - Das **Vorab-Kriterium** (lenient ≥ 8/10 gestützt, ≤ 5/10 nicht gestützt, dazwischen offen; S3.1 bleibt
+      unverändert) wurde in §2 eingetragen, bevor ein Validierungslauf stattfand.
+  - **Geändert:**
+    - Notebook:
+      - 5.1: VAL-T2 aktiv; VAL-T2-M1 neu (S3.1 · M1 · T2).
+      - 5.3: vorbelegt mit `VALIDATION_M2` (Schritt 1) und `VALIDATION_M1` (Schritt 3), dazu die Schrittliste im Text.
+      - 5.4: `HELD_SUITES` leer; `SUITE_MODEL_VARIANTS` neu; `run_suite(..., model="M1")` schreibt als
+        `suite:<datei>@M1`, Datei und Hash bleiben gleich; `run_suites` führt mehrere Suite-Läufe aus.
+      - 5.5: `SUITE_RUNS_M2` (Schritt 2) und `SUITE_RUNS_M1` (Schritt 4).
+      - 5.0: Zeilen für die Modellvarianten. 6.6: Vergleiche VAL-T2 → VAL-T2-M1 und Suite M2 → @M1.
+      - 6.10: O14-Spalten `gleiche_operation` und `andere_reihenfolge` sowie eine eigene Tabelle.
+      - 5.2: Ablehnungsprüfung mit E5 statt VAL-T2, weil VAL-T2 jetzt freigegeben ist.
+    - Export neu erzeugt: `run_summary.csv` und `run_stats.csv` haben nur die O14-Spalten dazubekommen.
+    - TN-021 angehängt (Text von Roland).
+    - Plan: §2 (zwei Zeilen), §3 (O14 umgesetzt), §7 (sechs Validierungszeilen).
+    - `playground.jsonl` +1: Rolands M2-Test um 11:39.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt, IPython-Shell, aus der Repo-Wurzel und aus `doc/`):**
+    - 34 Code-Zellen fehlerfrei, einschließlich 5.2 und 6.7.
+    - Vorschau: Schritt 1 zeigt VAL-T2 mit 10 offenen Läufen auf M2, Schritt 2 beide Suites auf M2 mit 2 × 10;
+      nichts zurückgehalten.
+    - Übersicht: alle sechs Validierungszeilen „geplant“, mit den richtigen Modellen und Seeds.
+    - Mock VAL-T2 + VAL-T2-M1: 20 Läufe, 60 Requests; S3.1, Modell und Seeds 201–210 in jedem Request-Body;
+      10 Paare.
+    - Suite auf M2 und @M1: eigene Experimente, der M1-Lauf wird durch den M2-Lauf nicht blockiert, gleicher Hash,
+      `qwen-3.5-35b` im Request-Body, 10 Paare.
+    - Abbruchregel: Bei einem Ausfall stoppt jeder Suite-Lauf nach 2 I-ERR, und beide werden versucht (wie in 5.3).
+    - O14: erwartete Reihenfolge ergibt „ja/nein“, gleichwertige andere Reihenfolge „ja/ja“ (Kategorie
+      protokollfehler), andere Form „nein/–“.
+    - Export auf den echten Daten: Raten unverändert; `failed_runs.csv` und `task_matrix.csv` sind bytegleich.
+    - TN-021: 21 Notizen mit 19 Spalten, alle Verweise gültig.
+    - `show_runs.py` liest die erweiterte CSV; die HTML-Ansichten sind unverändert.
+    - Rohdaten, Prompts, Suites und Lucas Dateien unverändert. Kein Request.
+  - **Nicht getestet:** echte Läufe; Darstellung in VS Code.
+  - **Offen:** O12a–d, O13. Vorschlag einer Thesis-Notiz zum Vorab-Kriterium liegt Roland vor.
+  - **Nächster Schritt:** Roland führt die Schritte 1–4 aus (Notebook 5.3), danach Auswertung nach dem Vorab-Kriterium.
 
 ## 14. Quellen
 
