@@ -34,6 +34,11 @@
 **Synchronisation:** Stand-PC ↔ Laptop nur über Git (commit/push → pull). Claude Codes Auto-Memory ist
 maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 
+**Thesis-Notizen:** `thesis/thesis_notes.csv` sammelt über alle Projektphasen, was in die Bachelorarbeit gehört:
+Befunde, Hypothesen, Ideen, Entscheidungen, offene Fragen, Limitationen, Literatur-TODOs. Regeln und Spalten stehen
+in `thesis/README.md`. Claude Code prüft am Ende jedes Schritts, ob eine neue Notiz entstanden ist, und schlägt
+Zeilen vor; angehängt wird erst nach Rolands Freigabe. Nie löschen, Zeiten Europe/Berlin.
+
 ## 2. Entscheidungen und geklärte Punkte
 
 | Datum | Punkt | Begründung / Konsequenz |

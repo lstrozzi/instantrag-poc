@@ -47,6 +47,9 @@ Luca Strozzi): streamed tool-call interception ("Instant RAG") using arithmetic 
   Never add a `Co-Authored-By: Claude …` trailer or any other Claude attribution to commit messages or PRs.
 - Scientific or design questions: add them to plan §3 and ask. Roland decides; the scientific
   discussion happens in his Claude Desktop project.
+- Thesis notes: check whether the step produced a thesis-relevant observation, decision, idea or open
+  question. If so, propose row(s) for `thesis/thesis_notes.csv` and append them only after Roland's
+  approval (rules: `thesis/README.md`; never delete rows; times Europe/Berlin).
 
 ## Environment
 - Windows, VS Code, Anaconda. Python environment: conda env `instantrag` (Python 3.11).
