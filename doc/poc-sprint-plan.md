@@ -237,12 +237,12 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
 | E7 | ab 16.11., nach Freigabe | Prompt-Paket S3 (16.11.) | S3 | M2 | T1 | 10 | E4 (S1 → S3), E1b (S0 → S3), gleiche Aufgaben und Seeds |
 | E7.1 | ab 16.11., nach Freigabe | S3-Iteration 1: S3.1 (Entwicklungsprotokoll §2) | S3.1 | M2 | T1 | 10 | E7 (S3 → S3.1), gleiche Aufgaben und Seeds |
 | E9 | gelaufen 18.11. 01:26–01:27 (Roland) | Modell M2 → M1 mit der eingefrorenen S3.1 | S3.1 | M1 | T1 | 10 | E1 (S0 → S3.1 auf M1), E7.1 (M2 → M1), gleiche Aufgaben und Seeds · **Ergebnis:** 10/10 auf allen Stufen, keine Korrektur; E1 → E9 6:0, p = 0,031 (beide Stufen); E7.1 → E9 funktional 6:0, p = 0,031, inkl. Korrektur 1:0, p = 1,0 |
-| VAL-T2 | 18.11., freigegeben – Schritt 1 (M2) | Validierung: Aufgabentyp T2 | S3.1 (eingefroren) | M2 | T2, Seeds 201–210 | 10 | – (andere Aufgaben als E7.1); Vorab-Kriterium §2 |
-| suite:val_t1_new.txt | 18.11., freigegeben – Schritt 2 (M2) | Validierung: T1-Form, neue Zahlen | S3.1 (eingefroren) | M2 | a+(b·c), Seeds 211–220 | 10 | E7.1 (T1, gleiche Form, andere Zahlen); Vorab-Kriterium §2 |
-| suite:val_forms.txt | 18.11., freigegeben – Schritt 2 (M2) | Validierung: andere Formen | S3.1 (eingefroren) | M2 | (b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230 | 10 | Vorab-Kriterium §2; O14 getrennt ausgewiesen |
-| VAL-T2-M1 | 18.11., freigegeben – Schritt 3 (M1) | Validierung: T2 auf M1 | S3.1 (eingefroren) | M1 | T2, Seeds 201–210 | 10 | VAL-T2 (Modell M2 → M1, gepaart); Vorab-Kriterium §2 |
-| suite:val_t1_new.txt@M1 | 18.11., freigegeben – Schritt 4 (M1) | Validierung: T1-Form, neue Zahlen, auf M1 | S3.1 (eingefroren) | M1 | wie `val_t1_new`, Seeds 211–220 | 10 | `suite:val_t1_new.txt` (M2 → M1, gepaart); Vorab-Kriterium §2 |
-| suite:val_forms.txt@M1 | 18.11., freigegeben – Schritt 4 (M1) | Validierung: andere Formen, auf M1 | S3.1 (eingefroren) | M1 | wie `val_forms`, Seeds 221–230 | 10 | `suite:val_forms.txt` (M2 → M1, gepaart); Vorab-Kriterium §2 |
+| VAL-T2 | gelaufen 18.11. 12:10–12:12 (Roland, Schritt 1) | Validierung: Aufgabentyp T2 | S3.1 (eingefroren) | M2 | T2, Seeds 201–210 | 10 | – (andere Aufgaben als E7.1); Vorab-Kriterium §2 · **Ergebnis:** lenient 6/10, funktional 5/10, strict 5/10, keine I-ERR |
+| suite:val_t1_new.txt | gelaufen 18.11. 12:17–12:19 (Roland, Schritt 2) | Validierung: T1-Form, neue Zahlen | S3.1 (eingefroren) | M2 | a+(b·c), Seeds 211–220 | 10 | E7.1 (T1, gleiche Form, andere Zahlen); Vorab-Kriterium §2 · **Ergebnis:** lenient 5/10, funktional 1/10, strict 1/10, keine I-ERR |
+| suite:val_forms.txt | gelaufen 18.11. 12:19–12:20 (Roland, Schritt 2) | Validierung: andere Formen | S3.1 (eingefroren) | M2 | (b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230 | 10 | Vorab-Kriterium §2; O14 getrennt ausgewiesen · **Ergebnis:** lenient 7/10, funktional 6/10, strict 5/10, keine I-ERR; O14: L07–L10 ohne andere Reihenfolge |
+| VAL-T2-M1 | gelaufen 18.11. 12:24 (Roland, Schritt 3) | Validierung: T2 auf M1 | S3.1 (eingefroren) | M1 | T2, Seeds 201–210 | 10 | VAL-T2 (Modell M2 → M1, gepaart); Vorab-Kriterium §2 · **Ergebnis:** lenient 10/10, funktional 7/10, strict 7/10, keine I-ERR |
+| suite:val_t1_new.txt@M1 | gelaufen 18.11. 12:26–12:27 (Roland, Schritt 4) | Validierung: T1-Form, neue Zahlen, auf M1 | S3.1 (eingefroren) | M1 | wie `val_t1_new`, Seeds 211–220 | 10 | `suite:val_t1_new.txt` (M2 → M1, gepaart); Vorab-Kriterium §2 · **Ergebnis:** lenient 9/10, funktional 8/10, strict 8/10, keine I-ERR |
+| suite:val_forms.txt@M1 | gelaufen 18.11. 12:27–12:28 (Roland, Schritt 4) | Validierung: andere Formen, auf M1 | S3.1 (eingefroren) | M1 | wie `val_forms`, Seeds 221–230 | 10 | `suite:val_forms.txt` (M2 → M1, gepaart); Vorab-Kriterium §2 · **Ergebnis:** lenient 10/10, funktional 7/10, strict 7/10, keine I-ERR; O14: L07–L10 ohne andere Reihenfolge |
 | E8 | nach Klärung mit Luca | RESULTS im System-Inhalt an Position 0 (O9) | – | – | T1 | 10 | offen |
 
 **V0 im Detail:** (a) `/v1/models` abfragen; (b) Cache: Referenz-Request zweimal identisch, dann mit anderem
@@ -928,6 +928,32 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
   - **Nicht getestet:** echte Läufe; Darstellung in VS Code.
   - **Offen:** O12a–d, O13. Vorschlag einer Thesis-Notiz zum Vorab-Kriterium liegt Roland vor.
   - **Nächster Schritt:** Roland führt die Schritte 1–4 aus (Notebook 5.3), danach Auswertung nach dem Vorab-Kriterium.
+- **2026-11-18 12:34 · Claude Code · Validierungsläufe gesichert (M2 und M1):**
+  - **Daten [Lauf]:** `runs.jsonl` +60 Zeilen (60 → 120), nur angehängt, kein API-Key.
+    - Je 10 Läufe in der geplanten Reihenfolge, alle M2-Läufe vor allen M1-Läufen: VAL-T2 12:10–12:12,
+      `suite:val_t1_new.txt` 12:17–12:19, `suite:val_forms.txt` 12:19–12:20, VAL-T2-M1 12:24,
+      `suite:val_t1_new.txt@M1` 12:26–12:27, `suite:val_forms.txt@M1` 12:27–12:28.
+    - Modelle, Seeds (201–210, 211–220, 221–230), S3.1-Hash und Suite-Hashes wie geplant.
+    - Kein Fehlerfeld, kein Stream ohne `finish_reason`, also keine I-ERR.
+  - **Notebook:** Die Datei ist unverändert seit 12:01 (= `37d59fb`), die Outputs der Validierungsläufe sind darin also
+    nicht enthalten und nicht im Commit. Alle RUN-Schalter in der Datei stehen auf `False`.
+  - **Export:**
+    - Notebook offline ausgeführt (IPython-Shell, Netzwerk gesperrt); die CSVs sind bytegleich mit Rolands Export
+      von 12:31.
+    - HTML-Ansichten neu erzeugt (120 Läufe, 64 nicht ok).
+  - **Ergebnisse [Lauf] (ohne Bewertung):**
+    - lenient / funktional / strict, je 10:
+      - VAL-T2 (M2) 6/5/5, VAL-T2-M1 10/7/7.
+      - `val_t1_new` M2 5/1/1, @M1 9/8/8.
+      - `val_forms` M2 7/6/5, @M1 10/7/7.
+    - Gepaart M2 → M1 (M1 besser : M2 besser), lenient: T2 4:0 (p = 0,125), `val_t1_new` 5:1 (p = 0,219),
+      `val_forms` 3:0 (p = 0,25). Funktional: T2 4:2 (p = 0,69), `val_t1_new` 7:0 (p = 0,016), `val_forms` 1:0
+      (p = 1,0).
+    - O14: `val_forms` L07–L10 auf beiden Modellen ohne andere Reihenfolge.
+  - **Vorab-Kriterium (§2):** mechanisch je Set und Modell angewandt, die Tabelle ging an Roland. Die Einordnung folgt;
+    Plan und Thesis-Notizen enthalten noch keine Interpretation.
+  - **Thesis-Notizen:** TN-022 (Vorab-Kriterium) angehängt; 22 Notizen, 19 Spalten, alle Verweise gültig.
+  - **Nächster Schritt:** Einordnung der Validierung mit Roland bzw. Luca.
 
 ## 14. Quellen
 

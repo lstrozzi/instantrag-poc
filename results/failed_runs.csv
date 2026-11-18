@@ -37,3 +37,29 @@
 45;18.11.2026 01:26;E1;S0;T1-06 · 26+(4*8);58;;abbruch_dep;1;A-LEAK A-WRONG;"Stage 1: ADD mit <DEP> vor dem ersten Ergebnis (<ADD x1=""26"" x2=""<DEP>""/>, im A…"
 46;18.11.2026 01:26;E1;S0;T1-07 · 19+(6*9);73;;abbruch_dep;1;A-LEAK A-WRONG;"Stage 1: ADD mit <DEP> vor dem ersten Ergebnis (<ADD x1=""19"" x2=""<DEP>""/>, im A…"
 47;18.11.2026 01:26;E1;S0;T1-08 · 32+(7*8);88;;abbruch_dep;1;A-LEAK A-WRONG;"Stage 1: ADD mit <DEP> vor dem ersten Ergebnis (<ADD x1=""32"" x2=""<DEP>""/>, im A…"
+63;18.11.2026 12:11;VAL-T2;S3.1;T2-04 · 8*(4+7);88;;keine_antwort;4;C-FINAL;"Stage 4: keine Antwort, Thinking endet mit <MUL id=""mul-1""/>"
+65;18.11.2026 12:11;VAL-T2;S3.1;T2-06 · 6*(7+9);96;96;ok_nach_korrektur;2;A-OMIT R-LOOP K-CORR;Stage 3: Tool-Call erst nach Korrektur-Prompt (Stage 2: kein Tool-Tag)
+66;18.11.2026 12:11;VAL-T2;S3.1;T2-07 · 4*(6+8);56;;keine_antwort;4;C-FINAL;"Stage 4: keine Antwort, Thinking endet mit <ADD id=""add-2""/>"
+67;18.11.2026 12:11;VAL-T2;S3.1;T2-08 · 7*(8+11);133;133;protokollfehler;2;B-PREM B-FORGE C-FINAL;"Stage 2: B-PREM: 133 in the answer channel before the server published it; B-FO…"
+68;18.11.2026 12:11;VAL-T2;S3.1;T2-09 · 9*(6+12);162;;abbruch_dep;2;A-WRONG;"Stage 2: MUL mit <DEP> vor dem ersten Ergebnis (<MUL x1=""9"" x2=""<DEP>""/>) → Har…"
+71;18.11.2026 12:17;suite:val_t1_new.txt;S3.1;val_t1_new-L02 · 17+(7*8);73;73;protokollfehler;2;A-OMIT K-CORR;Stage 2: A-OMIT: no tool tag attempted (Endantwort richtig)
+72;18.11.2026 12:18;suite:val_t1_new.txt;S3.1;val_t1_new-L03 · 11+(12*8);107;107;ok_nach_korrektur;3;K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: keine Antwort)
+73;18.11.2026 12:18;suite:val_t1_new.txt;S3.1;val_t1_new-L04 · 19+(11*12);151;;haengt_hold_message;4;A-WRONG C-FINAL;Stage 4: Hold-Message statt Endantwort, obwohl add-1=5 und mul-1=132 in RESULTS…
+74;18.11.2026 12:18;suite:val_t1_new.txt;S3.1;val_t1_new-L05 · 31+(9*12);139;;haengt_hold_message;2;A-OMIT;"Stage 2: Hold-Message statt Tool-Tag, auch nach Korrektur-Prompt; Lauf endet hi…"
+75;18.11.2026 12:18;suite:val_t1_new.txt;S3.1;val_t1_new-L06 · 13+(9*4);49;49;protokollfehler;2;A-OMIT K-CORR;Stage 2: A-OMIT: no tool tag attempted (Endantwort richtig)
+76;18.11.2026 12:18;suite:val_t1_new.txt;S3.1;val_t1_new-L07 · 28+(11*9);127;127;protokollfehler;3;A-WRONG;"Stage 3: A-WRONG: extra call after both results: <ADD x1=""28"" x2=""99""/> (Endant…"
+77;18.11.2026 12:19;suite:val_t1_new.txt;S3.1;val_t1_new-L08 · 33+(8*9);105;105;ok_nach_korrektur;3;K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: keine Antwort)
+78;18.11.2026 12:19;suite:val_t1_new.txt;S3.1;val_t1_new-L09 · 28+(12*4);76;76;ok_nach_korrektur;3;K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: keine Antwort)
+79;18.11.2026 12:19;suite:val_t1_new.txt;S3.1;val_t1_new-L10 · 31+(8*11);119;119;ok_nach_korrektur;1;A-OMIT K-CORR;Stage 2: Tool-Call erst nach Korrektur-Prompt (Stage 1: Hold-Message)
+80;18.11.2026 12:19;suite:val_forms.txt;S3.1;val_forms-L01 · (7*11)+17;94;;keine_antwort;4;C-FINAL;"Stage 4: keine Antwort, Thinking endet mit <ADD id=""add-1""/>"
+83;18.11.2026 12:19;suite:val_forms.txt;S3.1;val_forms-L04 · (9+7)*8;128;128;ok_nach_korrektur;3;K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: keine Antwort)
+84;18.11.2026 12:20;suite:val_forms.txt;S3.1;val_forms-L05 · (13+8)*4;84;;haengt_hold_message;4;A-WRONG C-FINAL;Stage 4: Hold-Message statt Endantwort, obwohl add-1=21 und add-2=21 in RESULTS…
+89;18.11.2026 12:20;suite:val_forms.txt;S3.1;val_forms-L10 · 20+(27+14);61;61;protokollfehler;3;A-WRONG;"Stage 3: A-WRONG: extra call after both results: <ADD x1=""20"" x2=""41""/> (Endant…"
+92;18.11.2026 12:24;VAL-T2-M1;S3.1;T2-03 · 6*(4+8);72;72;ok_nach_korrektur;3;A-WRONG K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: Hold-Message)
+93;18.11.2026 12:24;VAL-T2-M1;S3.1;T2-04 · 8*(4+7);88;88;ok_nach_korrektur;3;A-WRONG K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: Hold-Message)
+99;18.11.2026 12:24;VAL-T2-M1;S3.1;T2-10 · 8*(9+13);176;176;ok_nach_korrektur;2;A-OMIT K-CORR;Stage 3: Tool-Call erst nach Korrektur-Prompt (Stage 2: Hold-Message)
+105;18.11.2026 12:27;suite:val_t1_new.txt@M1;S3.1;val_t1_new-L06 · 13+(9*4);49;49;ok_nach_korrektur;3;A-WRONG K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: Hold-Message)
+108;18.11.2026 12:27;suite:val_t1_new.txt@M1;S3.1;val_t1_new-L09 · 28+(12*4);76;;haengt_hold_message;4;A-WRONG C-FINAL;Stage 4: Hold-Message statt Endantwort, obwohl mul-1=48 und add-1=76 in RESULTS…
+110;18.11.2026 12:27;suite:val_forms.txt@M1;S3.1;val_forms-L01 · (7*11)+17;94;94;ok_nach_korrektur;2;A-OMIT K-CORR;Stage 3: Tool-Call erst nach Korrektur-Prompt (Stage 2: Hold-Message)
+114;18.11.2026 12:27;suite:val_forms.txt@M1;S3.1;val_forms-L05 · (13+8)*4;84;84;ok_nach_korrektur;2;A-OMIT K-CORR;Stage 3: Tool-Call erst nach Korrektur-Prompt (Stage 2: Hold-Message)
+119;18.11.2026 12:28;suite:val_forms.txt@M1;S3.1;val_forms-L10 · 20+(27+14);61;61;ok_nach_korrektur;3;A-WRONG K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: Hold-Message)
