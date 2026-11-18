@@ -96,6 +96,8 @@ Zeilen vor; angehängt wird erst nach Rolands Freigabe. Nie löschen, Zeiten Eur
 | O13 | Auswahleffekt im Entwicklungsprotokoll S3.x: Bis zu 4 Iterationen auf denselben 10 T1-Aufgaben (gleiche Seeds) heben die T1-Rate der gewählten Version systematisch an; bei n = 10 und T = 0,1 kann auch Zufall eine Iteration über 8/10 bringen. | T1-Raten der S3.x-Iterationen nur als Entwicklungsdaten berichten; Aussagen zur Wirkung nur aus der einmaligen Validierung (T2 + neue Suite) der eingefrorenen Version; Anzahl der Iterationen in der Thesis nennen | offen |
 | O14 | Gleichartige Operationen in `val_forms` (`a*(b*c)`, `a+(b+c)`): Eine mathematisch gleichwertige andere Reihenfolge (für `4*(12*8)` erst `4*12`, dann `48*8`) ergibt A-WRONG in beiden Stages und bei richtiger Endantwort die Kategorie `protokollfehler` (offline belegt, 17.11.). | So lassen (Protokollregel „innerste zuerst“), in der Auswertung der Validierung aber getrennt ausweisen | umgesetzt 18.11.: Export 6.10 weist `gleiche_operation` und `andere_reihenfolge` je Lauf aus (`run_summary.csv`), die Anzahlen je Experiment stehen in `run_stats.csv`, dazu gibt es eine eigene Tabelle in 6.10; die Raten sind unverändert |
 | O15 | Nachträgliche Umstellung der Erfolgsdefinition: Das Abbruchkriterium vom 16.11. 21:03 lautete „≥ 8/10 funktional“. E7.1 erfüllt es erst mit „Erfolg inkl. Korrektur“ (Luca, 17.11.), beschlossen nach Sicht auf die E7.1-Daten (funktional 4/10, inkl. Korrektur 9/10). | In §2 als begründete Änderung kennzeichnen (die Korrektur gehört zum System) und in der Thesis offenlegen; H1 („funktionaler Erfolg im ersten Versuch“) unverändert lassen und die lenient-Rate zusätzlich berichten | entschieden 18.11. (Roland): wie vorgeschlagen |
+| O16 | Neuansatz nach dem Präfix (TN-024): Das 180B setzt in der ersten Stage mit Präfix in 15/28 Validierungsläufen neu an, das 35B in 0/30; mit Neuansatz sind 2/15 funktional ok, ohne 10/13 (§4.7). Die Klassifikation ist eine Heuristik aus der Fehleranalyse (Anfang des Thinkings nach dem Präfix: „The user …“, „We need …“), nicht Teil des Notebooks; ob der Neuansatz die Fehler verursacht, ist ungeprüft. | Heuristik als beschreibende Spalte in den Export übernehmen (Raten unverändert), damit sie reproduzierbar ist; Kausaltest in der Thesis-Phase über den Continue-Prompt (TP1, TN-015) | offen |
+| O17 | Harness führt zitierte und nacherzählte Tags aus (TN-025): `first_empty_tag` führt den ersten leeren Tag mit x-Argumenten aus, ohne zu prüfen, ob der Aufruf neu ist. Läufe 66 und 84 führen einen schon ausgeführten ADD erneut aus, Lauf 73 Beispiel A aus dem Prompt (§4.7). | Im PoC nicht ändern (Lucas Datei), in der Bewertung als eigenen Fall ausweisen; für den de²generator eine Regel „nur neue Aufrufe ausführen“ entwerfen; Luca informieren (Vertraulichkeit klären) | offen |
 
 **Thesis-Phase (nach Anmeldung, nicht im PoC)**
 
@@ -164,6 +166,29 @@ Kennzeichnung: **[Code]** im Code gelesen · **[Test]** offline geprüft (Regex-
      - E7.1 → E9: funktional 6:0, p = 0,031; inkl. Korrektur 1:0, p = 1,0.
    - **Leaks [Lauf]:** A-LEAK in 8 von 10 E1-Läufen und in keinem E9-Lauf.
    - **Einordnung:** Alles auf dem Entwicklungsset T1 (O13); aussagekräftig erst mit der Validierung.
+7. **Validierung und Fehleranalyse (18.11., S3.1 eingefroren, je Modell 3 × 10 Läufe, Nr. 60–119) [Lauf + Code + Indiz].**
+   Nr. = Zeile in `runs.jsonl` ab 0; Stage = Request-Nr. wie im Export (ein Korrektur-Prompt ist ein eigener Request).
+   - **(a) Vorab-Kriterium (TN-023) [Lauf]:** 35B (M1) in allen drei Sets gestützt, lenient 10/9/10 = 29/30, funktional
+     22/30. 180B (M2) auf T2 (6/10) und `val_forms` (7/10) offen, auf `val_t1_new` (5/10) nicht gestützt, lenient 18/30,
+     funktional 12/30. Auf der T1-Form fällt das 180B von 9/10 (E7.1) auf 5/10.
+   - **(b) Neuansatz nach dem Präfix (TN-024, O16) [Lauf + Indiz]:** In der ersten Stage mit Präfix setzt das 180B in
+     15/28 Läufen neu an (2 davon funktional ok), ohne Neuansatz sind 10/13 ok (Fisher p ≈ 0,002). Das 35B setzt in 0/30
+     neu an. Entwicklung: E7.1 5/10, E9 0/10. Heuristik, Kausalität ungeprüft.
+   - **(c) Korrekturen [Lauf]:** Die Korrektur rettet auf dem 35B 7 von 8 Läufen, auf dem 180B 6 von 15. Das 35B scheitert
+     ohne Neuansatz: Hold-Message ohne Tag in Stage 2 (Nr. 99, 110, 114), oder die Endstage wiederholt den schon
+     ausgeführten Call mit festen Zahlen und gibt die Hold-Message aus (Nr. 92, 93, 105, 108, 119; Muster aus E7.1 Nr. 34,
+     36 bekannt).
+   - **(d) Harness führt zitierte und nacherzählte Tags aus (TN-025, O17) [Lauf + Code]:** `first_empty_tag` führt den
+     ersten leeren Tag mit x-Argumenten aus. Nr. 66 und 84 führen einen schon ausgeführten ADD erneut aus (add-2), Nr. 73
+     führt Beispiel A aus dem Prompt aus (`<ADD x1="2" x2="3"/>`, add-1 = 5). In keinem früheren Lauf.
+   - **(e) Richtige Zahl ≠ protokolltreu (TN-026) [Lauf]:** 0 falsche Antworten in 60 Läufen, aber 5 Läufe des 180B mit
+     Protokollfehler und richtiger Zahl: Nr. 67 (selbst geschriebener RESULTS-Block für einen nie ausgeführten MUL),
+     Nr. 71 und 75 (Verweis auf die noch nicht veröffentlichte Id `add-1` nach der Korrektur), Nr. 76 und 89 (Endstage
+     wiederholt den ausgeführten Call).
+   - **(f) Neu gegenüber E7.1/E9 [Lauf]:** Kategorien `protokollfehler` (in keinem Entwicklungslauf), `keine_antwort`
+     (3, bekannt aus E4/E7), `abbruch_dep` (1, Nr. 68, bekannt aus E1/E1b/E4/E7); erstmals R-LOOP (Nr. 65) und die
+     Mechanismen aus (d). Der „We need …“-Stil (4 Läufe) war aus E1b/E4 bekannt, in E7/E7.1 nicht aufgetreten. Auf dem 35B
+     sind Korrekturen und `haengt_hold_message` (1) neu gegenüber E9.
 
 ## 5. Phasen und Prüfkriterien (Kurzfassung)
 
@@ -954,6 +979,30 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
     Plan und Thesis-Notizen enthalten noch keine Interpretation.
   - **Thesis-Notizen:** TN-022 (Vorab-Kriterium) angehängt; 22 Notizen, 19 Spalten, alle Verweise gültig.
   - **Nächster Schritt:** Einordnung der Validierung mit Roland bzw. Luca.
+- **2026-11-18 13:30 · Claude Code · Fehleranalyse der Validierung, Einordnung Roland:**
+  - **Fehleranalyse (nur lesend, offline):** Kategorien und Stage je Set und Modell, die 12 auch nach Korrektur
+    gescheiterten Läufe des 180B, die 13 Korrekturen mit Neuansatz ja/nein, Vergleich mit E7.1/E9. Quellen:
+    `run_summary.csv`, `run_stats.csv` (Export 12:31) und `runs.jsonl`. Die Neuansatz-Klassifikation ist eine Heuristik
+    in einem Hilfsskript außerhalb des Repos (nicht im Notebook, O16).
+  - **Umgebung:** Die Analyse-Session lief mit `C:\Python314` statt des Env `instantrag` (Claude Code nicht aus der
+    Anaconda Prompt gestartet). Genutzt wurden nur `csv` und `json`; das Ergebnis hängt davon nicht ab.
+  - **Geändert:**
+    - §4.7 neu (Validierung und Fehleranalyse, Befunde a–f), §3 O16 (Neuansatz) und O17 (zitierte Tags).
+    - Thesis-Notizen nach Rolands Einordnung: TN-023 bis TN-027 angehängt; TN-018 (Validierung, Rettungsquote,
+      Hypothese präzisiert), TN-009 (abbruch_dep in der Validierung) und TN-011 (Status erledigt) geändert.
+  - **Gegengeprüft (tatsächlich ausgeführt):**
+    - lenient/funktional 35B 29/22, 180B 18/12 von 30; abbruch_dep 180B 1, 35B 0; falsche_antwort 0;
+      protokollfehler 180B 5.
+    - Korrektur nötig / damit gelungen: 35B 8/7, 180B 15/6 (Rolands Angabe „7/30“ für das 35B sind die
+      `ok_nach_korrektur`-Läufe; korrigiert wurden 8, Lauf 108 bleibt hängen).
+    - Neuansatz 180B 15/28 (2 ok) vs. 13 (10 ok), 35B 0/30; Fisher exakt zweiseitig p = 0,0016.
+    - `first_empty_tag` (`src/instantrag_qwen_demo.py`) gelesen: führt den ersten leeren Tag mit x-Argumenten aus,
+      ohne Prüfung, ob er neu ist.
+    - `thesis_notes.csv`: csv-Modul, Lesen und Zurückschreiben vor der Änderung bytegleich; 27 Notizen, 19 Spalten,
+      alle TN-Verweise vorhanden, BOM und LF erhalten, nur die drei geänderten Zeilen anders.
+  - **Nicht getestet:** Kausalität des Neuansatzes (TN-024). Kein Request, kein Lauf.
+  - **Offen:** O12a–d, O13, O16, O17; Modellwahl Hauptstudie (TN-027, mit Luca).
+  - **Nächster Schritt:** Einordnung mit Luca (TN-025 Vertraulichkeit, TN-027 Modellwahl).
 
 ## 14. Quellen
 
