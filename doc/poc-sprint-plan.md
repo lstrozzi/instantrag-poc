@@ -876,6 +876,14 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
   - **Offen:** O12a–d, O13, O14. Vorschlag einer neuen Thesis-Notiz zu den Leaks (E1 8/10, E9 0/10) liegt Roland vor.
   - **Nächster Schritt:** Validierung am 18.11. vormittags nach Rolands Freigabe (VAL-T2 und beide Suites auf M2 mit
     S3.1).
+- **2026-11-18 02:40 · Claude Code · Thesis-Notiz TN-020 (Leaks):**
+  - **Geändert:** TN-020 nach Rolands Freigabe angehängt, mit seinen Ergänzungen: Satz zur Kanalregel auf dem 180B,
+    RQ1/RQ3, Kapitel Ergebnisse/Diskussion. Die Zahlen stammen aus `results/run_stats.csv` (`mit_leak`): 35B E1 8,
+    E9 0; 180B E1b 3, E4 5, E7 5, E7.1 3, jeweils von 10.
+  - **Kanalregel:** Ob ein Prompt sie enthält, ist im Prompttext geprüft: S1 hat keine, S2, S3 und S3.1 haben sie.
+  - **Geprüft:** 20 Notizen, 19 Spalten je Zeile, alle TN-Verweise vorhanden, die übrigen Zeilen bytegleich, BOM und
+    LF erhalten.
+  - **Nächster Schritt:** Validierung nach Rolands Freigabe.
 
 ## 14. Quellen
 
