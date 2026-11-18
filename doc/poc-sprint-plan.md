@@ -80,7 +80,7 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 | O7 | Wortlaut der Prompt-Varianten S1/S2 | Entwurf in Schritt 5, Freigabe durch Roland | entschieden 15.11. 20:41 – Dateien angelegt, siehe `doc/prompt-versions.md` |
 | O8 | `CLAUDE.md` committen? Gilt dann für alle Claude-Code-Nutzer des Repos, auch Luca. | ja, Luca kurz informieren | entschieden 15.11. (§2): Commit erst nach der Worksession |
 | O9 | RESULTS-Platzierung: Roland erinnert eine Absprache mit Luca „als System-Nachricht“. Laut `instantrag.md` §2/§7 lehnt das Gateway System-Nachrichten außerhalb von Position 0 ab (HTTP 400). | Montag in Rolle `user` wie in Lucas Harness (Replikation); S1/S2 beschreiben RESULTS rollenneutral als Server-Nachricht; Variante „RESULTS im System-Inhalt an Position 0“ als E8 nach Klärung mit Luca (§11; bis 16.11. als E7 geführt, die ID ging an S3) | offen |
-| O10 | Resume-Präfix: Roland schlägt `<thinking>…</thinking>` statt `<\|im_start\|>` vor. | Protokoll nicht umschreiben: `<\|im_start\|>` ist der ChatML-Nachrichtenstart, Qwens Thinking-Block ist `<think>…</think>`, ein schließendes Tag würde das Thinking beenden. V0 (c) testet `<\|im_start\|>` / `<think>` / ohne Präfix; im Notebook wird der Reasoning-Kanal als „Thinking“ beschriftet | offen |
+| O10 | Resume-Präfix: Roland schlägt `<thinking>…</thinking>` statt `<\|im_start\|>` vor. | Protokoll nicht umschreiben: `<\|im_start\|>` ist der ChatML-Nachrichtenstart, Qwens Thinking-Block ist `<think>…</think>`, ein schließendes Tag würde das Thinking beenden. V0 (c) testet `<\|im_start\|>` / `<think>` / ohne Präfix; im Notebook wird der Reasoning-Kanal als „Thinking“ beschriftet. **Ergänzung 18.11.:** Die Hypothese, die Harness-Fortsetzung sei grundsätzlich das Problem, ist durch E9 abgeschwächt. Mit gleichem Harness und gleichem Präfix braucht M1 mit S3.1 keine Korrektur (10/10), M2 (E7.1) dagegen in 5/10 (§4.6, TN-018). Die Ursache beim 180B ist offen. | offen |
 | O11 | Präzisierungen der Bewertungsregeln aus Schritt 3 (Notebook 6.1): (a) Id-Verweis auf eine nicht veröffentlichte Id = A-WRONG (Vorschlag war A-MALF; A-MALF bleibt „vom Parser nicht erkannt“); (b) `18.5` und `0.18` zählen nicht als 18; (c) Soll-Argumente von Call 2 mit dem tatsächlich veröffentlichten Wert (relevant für E6); (d) C-FINAL auch für eine vorzeitige Antwort mit Zahl in Phase −3; (e) jeder Call nach beiden Ergebnissen = A-WRONG; (f) „korrekt“ in Phase −1/−2 = ausgeführte Calls wie erwartet | bestätigen | entschieden 15.11.: (a) als A-WRONG, (b)–(f) wie vorgeschlagen |
 | O12a | Endantwort-Regel (Notebook 6.2 `final_value`: Zahl nach dem letzten „=“): `13 + (6 * 7) = 55, because 6 * 7 = 42` ergibt Endwert 42 und C-FINAL, obwohl die Antwort stimmt (Review 15.11., offline belegt). | C-FINAL nur, wenn der Sollwert nirgends als ganze Zahl steht oder eine andere Zahl als Ergebnis behauptet wird; solche Fälle in die Handprüfung | offen – noch nicht umgesetzt |
 | O12b | A-MALF bei zitierter Tag-Syntax: Thinking mit `<ADD x1="..." x2="..." [...] xn="..."/>` (Zitat aus dem Systemprompt) und danach korrektem, ausgeführtem Call ergibt A-MALF und Stufe ✗; ein Rückblick auf den Call im Thinking der Endantwort ergibt A-WRONG (Review 15.11., offline belegt). | A-MALF nur als Fehler, wenn in der Stage kein gültiger Call ausgeführt wurde, sonst beschreibend; für den Rückblick in der Endantwort analog entscheiden | offen – noch nicht umgesetzt |
@@ -108,7 +108,8 @@ maschinenlokal – alles Relevante gehört in diese Datei oder in `CLAUDE.md`.
 ## 4. Befundlage (Analyse 2026-11-14)
 
 Kennzeichnung: **[Code]** im Code gelesen · **[Test]** offline geprüft (Regex-Muster, ohne LLM) ·
-**[Doku]** laut `doc/instantrag.md` · **[Indiz]** Schlussfolgerung, ungeprüft.
+**[Doku]** laut `doc/instantrag.md` · **[Indiz]** Schlussfolgerung, ungeprüft · **[Lauf]** aus echten Läufen
+(`results/runs.jsonl`, Auswertung 6.8/6.10).
 
 1. **Resume ist vermutlich keine Fortsetzung, sondern eine neue Antwort [Indiz].**
    - Request setzt weder `continue_final_message` noch `add_generation_prompt`; vLLM-Defaults:
@@ -139,6 +140,23 @@ Kennzeichnung: **[Code]** im Code gelesen · **[Test]** offline geprüft (Regex-
    („several“, „every recorded run“) ohne Nenner. Doku-Läufe: `qwen-3.5-35b` @ `thalabus-ai-1:8081`, T = 0,1.
    Repo-Config: `qwen-3.8-180b-next` @ `llm.thalabus.ai`, T = 0,7 und `max_tokens` 256 – beide vom Skript
    ignoriert (Defaults 0,1 und 2048).
+6. **M1-Läufe E1/E9 (18.11., `qwen-3.5-35b`, T1 = Entwicklungsset) [Lauf + Indiz].**
+   - **(a) Reihenfolgefehler verschwinden auch auf M1 [Lauf]:** abbruch_dep sinkt von 6/10 (E1, S0) auf 0/10 (E9, S3.1).
+     Dass das an Beispiel D liegt, ist ein **[Indiz]**. Gestützt wird es durch M2: E7 → E7.1 (S3 → S3.1, u. a. Beispiel
+     D) senkt abbruch_dep von 4 auf 0. Auf M1 ist die Wirkung nicht isoliert, weil E1 → E9 alle Änderungen S0 → S3.1
+     bündelt.
+   - **(b) M1 braucht mit S3.1 keine Korrektur, M2 in 5/10 [Lauf]:** E9 10/10 ohne Korrektur, E7.1 5 × ok_nach_korrektur.
+     Das Fortsetzungsverhalten ist vermutlich modellabhängig **[Indiz]**:
+     - Lauf Nr. 30 (E7.1 · T1-01, 180B) setzt in Stage 2 neu an („The user wants me to calculate …“), endet mit der
+       Hold-Message und braucht den Korrektur-Prompt.
+     - Lauf Nr. 56 (E9 · T1-07, 35B) setzt direkt fort („I have the result … Now I need to add 19“).
+     - Gegenstück zu Nr. 30 bei derselben Aufgabe T1-01 ist Nr. 50 (E9, 35B). Dort folgt in Stage 2 sofort der nächste
+       Call; Stage 3 wiederholt das Präfix wörtlich, beendet den Satz und antwortet.
+   - **Raten [Lauf]:** E1 funktional 4/10 = inkl. Korrektur 4/10 (strict 2/10); E9 10/10 auf allen Stufen.
+     - E1 → E9: 6:0, p = 0,031 (beide Stufen).
+     - E7.1 → E9: funktional 6:0, p = 0,031; inkl. Korrektur 1:0, p = 1,0.
+   - **Leaks [Lauf]:** A-LEAK in 8 von 10 E1-Läufen und in keinem E9-Lauf.
+   - **Einordnung:** Alles auf dem Entwicklungsset T1 (O13); aussagekräftig erst mit der Validierung.
 
 ## 5. Phasen und Prüfkriterien (Kurzfassung)
 
@@ -203,7 +221,7 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
 | ID | Wann | Änderung | S | M | T | Läufe | Vergleich |
 |---|---|---|---|---|---|---|---|
 | V0 | Mo, zuerst | Messung prüfen | S0 | M1 | Referenz | ~8 Requests | – |
-| E1 | Mo | Ausgangslage | S0 | M1 | T1 | 10 | Lucas Doku |
+| E1 | gelaufen 18.11. 01:26 (Roland) | Ausgangslage | S0 | M1 | T1 | 10 | Lucas Doku · **Ergebnis:** funktional 4/10 = inkl. Korrektur 4/10 (strict 2/10), abbruch_dep 6, A-LEAK in 8 Läufen |
 | E2 | Mo | Prompt S0→S1 | S1 | M1 | T1 | 10 | E1, gleiche Aufgaben |
 | E4 | Mo | Modell M1→M2 | S1 | M2 | T1 | 10 | E2, gleiche Aufgaben |
 | E3 | bis Mi | Prompt S1→S2 | S2 | M1 | T1 | 10 | E2, gleiche Aufgaben |
@@ -211,7 +229,7 @@ codiert), `seed` pro Lauf. Geloggt: Prompt-SHA-256, Git-Commit, Endpoint, Modell
 | E6 | optional bis Fr | Server liefert falsche Werte (Eingriff von außen) | S1 | M1 | T1 | 10 | E2 |
 | E7 | ab 16.11., nach Freigabe | Prompt-Paket S3 (16.11.) | S3 | M2 | T1 | 10 | E4 (S1 → S3), E1b (S0 → S3), gleiche Aufgaben und Seeds |
 | E7.1 | ab 16.11., nach Freigabe | S3-Iteration 1: S3.1 (Entwicklungsprotokoll §2) | S3.1 | M2 | T1 | 10 | E7 (S3 → S3.1), gleiche Aufgaben und Seeds |
-| E9 | Nacht zum 18.11., Lauf durch Roland | Modell M2 → M1 mit der eingefrorenen S3.1 | S3.1 | M1 | T1 | 10 | E1 (S0 → S3.1 auf M1), E7.1 (M2 → M1), gleiche Aufgaben und Seeds |
+| E9 | gelaufen 18.11. 01:26–01:27 (Roland) | Modell M2 → M1 mit der eingefrorenen S3.1 | S3.1 | M1 | T1 | 10 | E1 (S0 → S3.1 auf M1), E7.1 (M2 → M1), gleiche Aufgaben und Seeds · **Ergebnis:** 10/10 auf allen Stufen, keine Korrektur; E1 → E9 6:0, p = 0,031 (beide Stufen); E7.1 → E9 funktional 6:0, p = 0,031, inkl. Korrektur 1:0, p = 1,0 |
 | VAL-T2 | 18.11. vormittags, nach Freigabe (zurückgehalten) | Validierung: Aufgabentyp T2 | S3.1 (eingefroren) | M2 | T2, Seeds 201–210 | 10 | – (andere Aufgaben als E7.1) |
 | suite:val_t1_new.txt | 18.11. vormittags, nach Freigabe (zurückgehalten) | Validierung: T1-Form, neue Zahlen | S3.1 (eingefroren) | M2 | a+(b·c), Seeds 211–220 | 10 | E7.1 (T1, gleiche Form, andere Zahlen) |
 | suite:val_forms.txt | 18.11. vormittags, nach Freigabe (zurückgehalten) | Validierung: andere Formen | S3.1 (eingefroren) | M2 | (b·c)+a ×3, (a+b)·c ×3, a·(b·c) ×2, a+(b+c) ×2; Seeds 221–230 | 10 | – |
@@ -808,6 +826,51 @@ Ab 15.11. 20:45: Einträge mit Datum **und Uhrzeit** (Europe/Berlin). Prompt-Ver
   - **Nächster Schritt:**
     - Roland: E1 + E9 auf M1 (5.3 `RUN_EXPERIMENTE = True`), danach Export 6.10.
     - 18.11. vormittags nach Freigabe: VAL-T2 `active = True`, `HELD_SUITES` leeren, Läufe, danach Export.
+- **2026-11-18 02:28 · Claude Code · E1/E9 gesichert, Fix Diagramm 6.6/6.8, Doku, Thesis-Notizen:**
+  - **Zwischenstopp (01:59):** `thesis/` fehlte, und das Notebook enthielt die Outputs des M1-Laufs nicht. Roland
+    meldete danach Notebook gespeichert und geschlossen sowie `thesis/` angelegt.
+  - **Daten [Lauf]:**
+    - `runs.jsonl` +20 Zeilen: E1 und E9 je 10, `qwen-3.5-35b`, Seeds 101–110, E1 01:26:05–01:26:28, E9
+      01:26:34–01:27:07, kein Fehlerfeld, keine I-ERR. Die 40 vorhandenen Zeilen sind inhaltlich unverändert; bei
+      den 20 ältesten sind nur die Zeilenenden durch einen Checkout CRLF, Git gleicht das beim Commit aus.
+    - `playground.jsonl` +1 Zeile: 01:21, M1, S0, `7*(4+9)`, Erreichbarkeitstest, ohne Fehler.
+    - Kein API-Key in den neuen Zeilen.
+  - **Notebook:** Die Datei ist auch nach Rolands Speichern unverändert seit 01:14 (gleich `e323f57`). Die Outputs des
+    M1-Laufs sind daher nicht im Commit. `RUN_EXPERIMENTE = False`, Playground `RUN = False`.
+  - **Bug Diagramm 6.6/6.8 (Commit `d5aba66`):**
+    - Ursache bestätigt: `wilson_interval(10, 10)` liefert als Obergrenze `0.9999999999999999`, der obere
+      Fehlerbalken wird −1,1·10⁻¹⁶, und matplotlib bricht mit „'yerr' must not contain negative values“ ab. 0/10
+      ergibt bei dieser Formel exakt 0.
+    - Fix: Fehlerbalken auf ≥ 0 begrenzt.
+    - Zusätzlich (Freigabe Roland): Die Beschriftung zeigt k/n der Stufe lenient, das Hauptmaß nach §8.
+  - **Tests (tatsächlich ausgeführt, offline, Netzwerk gesperrt, IPython-Shell, aus der Repo-Wurzel und aus `doc/`):**
+    - Die alte Funktion scheitert bei 10/10 (und mit allen drei Fällen), läuft bei 0/10 und 7/10. Die neue läuft bei
+      0/10, 10/10, 7/10 und mit allen drei Fällen.
+    - Beschriftung: „9/10“ bei funktional 4/10 und lenient 9/10, mittig über dem lenient-Balken, an dessen oberer
+      KI-Grenze.
+    - Ganzes Notebook (34 Code-Zellen) fehlerfrei, 6.8 auf den echten Daten mit beiden Vergleichsstufen.
+    - Der Export aus 6.10 ist bytegleich mit Rolands Export (01:30). HTML-Ansichten neu erzeugt (60 Läufe, 38 nicht ok).
+  - **Ergebnisse (aus 6.8/6.10, gleich Rolands Kontrollwerten):**
+    - E1 funktional 4/10 = inkl. Korrektur 4/10 (strict 2/10), abbruch_dep 6, A-LEAK in 8 Läufen.
+    - E9 10/10 auf allen Stufen, keine Korrektur, kein Leak.
+    - E1 → E9: 6:0, p = 0,031 (beide Stufen).
+    - E7.1 → E9: funktional 6:0, p = 0,031; inkl. Korrektur 1:0, p = 1,0.
+  - **Doku:** §7 (E1/E9 gelaufen mit Ergebnis), §4 (Befund 6 und Kennzeichnung [Lauf]), §3 O10 (Ergänzung).
+    - Befund (a) ist als Indiz formuliert, gestützt durch M2 (E7 → E7.1: abbruch_dep 4 → 0).
+    - Bei den Läufen 30 (E7.1 · T1-01) und 56 (E9 · T1-07) stehen jetzt die Aufgaben dabei. Nr. 50 (E9 · T1-01) ist als
+      Gegenstück zu Nr. 30 genannt.
+    - Prüfung Lauf 50: setzt direkt fort. Stage 2 bringt sofort den nächsten Call, Stage 3 wiederholt das Präfix
+      wörtlich und antwortet (`prefix_echo` Stage 2 nein, Stage 3 ja). Lauf 30 setzt dagegen in Stage 2 neu an.
+  - **Thesis-Notizen** (eigener Commit „Add thesis notes log“):
+    - `thesis/thesis_notes.csv` ist lesbar mit dem csv-Modul (`;`, utf-8-sig, LF), hat 19 Spalten je Zeile und 19
+      Notizen TN-001 bis TN-019; alle 23 TN-Verweise existieren. Lesen und Zurückschreiben ist bytegleich.
+    - TN-009 und TN-018 korrigiert (Freigabe Roland), „Geändert“ 2026-11-18 02:26 mit Grund; nur diese beiden Zeilen
+      haben sich geändert.
+    - Regel in `CLAUDE.md` und Verweis in §1.
+  - **Nicht getestet:** Darstellung des Diagramms in VS Code.
+  - **Offen:** O12a–d, O13, O14. Vorschlag einer neuen Thesis-Notiz zu den Leaks (E1 8/10, E9 0/10) liegt Roland vor.
+  - **Nächster Schritt:** Validierung am 18.11. vormittags nach Rolands Freigabe (VAL-T2 und beide Suites auf M2 mit
+    S3.1).
 
 ## 14. Quellen
 

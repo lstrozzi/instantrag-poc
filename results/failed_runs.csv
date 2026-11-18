@@ -31,3 +31,9 @@
 36;16.11.2026 21:14;E7.1;S3.1;T1-07 · 19+(6*9);73;73;ok_nach_korrektur;3;A-WRONG K-CORR;Stage 4: Endantwort erst nach Korrektur-Prompt (Stage 3: A-WRONG)
 37;16.11.2026 21:14;E7.1;S3.1;T1-08 · 32+(7*8);88;;haengt_hold_message;3;A-OMIT;Stage 3: Hold-Message statt Tool-Tag, obwohl mul-1=56 in RESULTS standen, auch…
 38;16.11.2026 21:14;E7.1;S3.1;T1-09 · 11+(8*9);83;83;ok_nach_korrektur;2;A-OMIT K-CORR;Stage 3: Tool-Call erst nach Korrektur-Prompt (Stage 2: Hold-Message)
+41;18.11.2026 01:26;E1;S0;T1-02 · 13+(6*7);55;;abbruch_dep;1;A-LEAK A-WRONG;"Stage 1: ADD mit <DEP> vor dem ersten Ergebnis (<ADD x1=""13"" x2=""<DEP>""/>, im A…"
+42;18.11.2026 01:26;E1;S0;T1-03 · 21+(4*9);57;;abbruch_dep;1;A-LEAK A-WRONG;"Stage 1: ADD mit <DEP> vor dem ersten Ergebnis (<ADD x1=""21"" x2=""<DEP>""/>, im A…"
+44;18.11.2026 01:26;E1;S0;T1-05 · 14+(7*9);77;;abbruch_dep;1;A-LEAK A-WRONG;"Stage 1: ADD mit <DEP> vor dem ersten Ergebnis (<ADD x1=""14"" x2=""<DEP>""/>, im A…"
+45;18.11.2026 01:26;E1;S0;T1-06 · 26+(4*8);58;;abbruch_dep;1;A-LEAK A-WRONG;"Stage 1: ADD mit <DEP> vor dem ersten Ergebnis (<ADD x1=""26"" x2=""<DEP>""/>, im A…"
+46;18.11.2026 01:26;E1;S0;T1-07 · 19+(6*9);73;;abbruch_dep;1;A-LEAK A-WRONG;"Stage 1: ADD mit <DEP> vor dem ersten Ergebnis (<ADD x1=""19"" x2=""<DEP>""/>, im A…"
+47;18.11.2026 01:26;E1;S0;T1-08 · 32+(7*8);88;;abbruch_dep;1;A-LEAK A-WRONG;"Stage 1: ADD mit <DEP> vor dem ersten Ergebnis (<ADD x1=""32"" x2=""<DEP>""/>, im A…"
